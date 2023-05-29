@@ -194,7 +194,7 @@ Begin
 End
 -------------------------------------------------------------------------------------------------------------------------------------- 
 -- Droping Index  
-IF Not Exists (SELECT 1 FROM sys.indexes  WHERE object_id = OBJECT_ID('Person.Address') AND name='IX_Address_PostalCode')
+IF Exists (SELECT 1 FROM sys.indexes  WHERE object_id = OBJECT_ID('Person.Address') AND name='IX_Address_PostalCode')
 Begin 
 	Drop INDEX IX_Address_PostalCode  
 	ON Person.Address  
