@@ -14,9 +14,9 @@ begin catch
 end catch
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Store Proc Checking 
-IF OBJECT_ID(N'API.usp_Send_SingleWATISMS', N'P') IS NOT NULL
+IF OBJECT_ID(N'API.GetRefreshToken', N'P') IS NOT NULL
 BEGIN
-	drop proc API.usp_Send_SingleWATISMS
+	drop proc API.GetRefreshToken
 END
 go 
 Create proc SPAPI.GetRefreshToken
@@ -81,7 +81,7 @@ begin
 	add constraint FK_RoleMenu Foreign key (RoleId) references Roles(RoleId)
 end
 --------------------------------------------------------------------------------------------------------------------------------------
--- Checking Foreign Key 
+-- Checking unique Key 
 IF NOT EXISTS(SELECT 1 FROM sys.key_constraints WHERE type = 'UQ'   and name='UK_RoleMenu')
 begin
 	alter table dbo.RoleMenu
@@ -94,9 +94,9 @@ CREATE proc sp_s
 as  
 begin    
   
- select   'sp_helptext ''' +  s.name + '.'+ t.name  + '''' FROM sys.procedures as t   
- inner join sys.schemas s on s.schema_id=t.schema_id where   t.name like '%'+ @tbl +'%'   
-    
+	select   'sp_helptext ''' +  s.name + '.'+ t.name  + '''' FROM sys.procedures as t   
+	inner join sys.schemas s on s.schema_id=t.schema_id where   t.name like '%'+ @tbl +'%'   
+
 end
 go
 --------------------------------------------------------------------------------------------------------------------------------------
@@ -106,9 +106,9 @@ CREATE proc sp_t
 as  
 begin   
     
- select   'select top 3  * from ' +  s.name + '.'+ t.name + ' ORDER BY  1 DESC ' FROM sys.tables as t   
- inner join sys.schemas s on s.schema_id=t.schema_id where   t.name like '%'+ @tbl +'%'   
-    
+	select   'select top 3  * from ' +  s.name + '.'+ t.name + ' ORDER BY  1 DESC ' FROM sys.tables as t   
+	inner join sys.schemas s on s.schema_id=t.schema_id where   t.name like '%'+ @tbl +'%'   
+
 end
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Creating temp table 
