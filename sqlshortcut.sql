@@ -199,4 +199,62 @@ Begin
 	Drop INDEX IX_Address_PostalCode  
 	ON Person.Address  
 End
+-------------------------------------------------------------------------------------------------------------------------------------- 
+-- Direct JSON from SQL select 
 GO
+IF OBJECT_ID(N'GSTAPI.findGSTR2BMaster', N'P') IS NOT NULL
+BEGIN
+	drop proc GSTAPI.findGSTR2BMaster
+END
+go 
+Create proc GSTAPI.findGSTR2BMaster
+@companyId int,
+@year int,
+@month int,
+@GstNo varchar(255),
+@GstType varchar(255)
+As 
+BEGIN
+	
+	SET NOCOUNT ON; 
+
+	select   R2BM.company_id,R2BM.gst_no,R2BM.month,R2BM.year,R2BM.return_period,R2BM.created_at
+	,
+	--GSTR2B_Vendor
+	gstr2b=(
+	select ISNULL(
+			(select  R2BMV.id,R2BMV.gstr2b_master_id,R2BMV.gst_no,R2BMV.trade_name,R2BMV.supplier_filing_date,R2BMV.supplier_filing_period
+			--GSTR2B_Invoice
+			,gstr2bInvoice=(
+			select ISNULL(
+					(select  R2BMI.id,R2BMI.gstr2b_vendor_id,R2BMI.place_of_supply,R2BMI.invoice_date,R2BMI.invoice_number,R2BMI.invoice_type
+					,R2BMI.invoice_value,R2BMI.itc_availability,R2BMI.itc_unavailability,R2BMI.supply_reverse_charge,R2BMI.itc_claim_month
+					,R2BMI.itc_claim_year	
+					--gstr2bItem
+					,GSTR2B_Item=(
+					select ISNULL(
+							(select  R2BMIT.id,R2BMIT.gstr2b_invoice_id,R2BMIT.item_number,R2BMIT.total_taxable_value,R2BMIT.tax_rate,R2BMIT.igst,R2BMIT.cgst,R2BMIT.sgst,R2BMIT.cess			
+							from GSTAPI.GSTR2B_Item  as R2BMIT with (nolock)
+							where  R2BMIT.gstr2b_invoice_id=R2BMI.id 
+							for json path, include_null_values
+							) ,'[]')
+						)
+					from GSTAPI.GSTR2B_Invoice  as R2BMI with (nolock)
+					where  R2BMI.gstr2b_vendor_id=R2BMV.id 
+					for json path, include_null_values
+					) ,'[]')
+				)
+			from GSTAPI.GSTR2B_Vendor  as R2BMV with (nolock)
+			where  R2BMV.gstr2b_master_id=R2BM.id 
+			for json path, include_null_values
+			) ,'[]')
+		)
+	from GSTAPI.GSTR2B_Master  as R2BM with (nolock)
+	--inner join masters.[State] as s with(nolock) on s.GSTStateName = p.ship_to_state4gst
+	where R2BM.company_id = @companyId and R2BM.year = @year and R2BM.month = @month
+	for json path
+
+	SET NOCOUNT OFF;
+
+END
+go  
