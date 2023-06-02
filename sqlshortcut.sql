@@ -111,6 +111,106 @@ begin
 
 end
 --------------------------------------------------------------------------------------------------------------------------------------
+-- write select statement with columns using schema.table  as parameter
+IF OBJECT_ID(N'dbo.sp_se', N'P') IS NOT NULL
+BEGIN
+	drop proc dbo.sp_se
+END
+GO 
+CREATE proc sp_se  
+@P1 varchar(200)  
+as  
+begin   
+    
+	--DECLARE @P1 VARCHAR(100)
+ 
+	--SET @P1='APIRPT.LEDGERSUMMARY'
+ 
+	DECLARE @TABLE_NAME VARCHAR (100), @TABLE_SCHEMA VARCHAR(100) 
+ 
+	SET @TABLE_SCHEMA= SUBSTRING (@P1, 0, CHARINDEX('.', @P1))
+	SET @TABLE_SCHEMA = IIF(isnull(@TABLE_SCHEMA,'')='','DBO','') 
+
+	SET @TABLE_NAME= SUBSTRING (@P1, CHARINDEX('.',@P1) +1,LEN (@P1)) 
+	--SP_SE 
+	SELECT 'SELECT '+ STUFF ( (SELECT ',' + IIF(ISNUMERIC(SUBSTRING (COLUMN_NAME, 1, 1))=1, '[' +COLUMN_NAME, COLUMN_NAME) + IIF(ISNUMERIC(SUBSTRING (COLUMN_NAME, 1, 1))=1, ']', '') 
+	FROM INFORMATION_SCHEMA.COLUMNS
+	WHERE TABLE_NAME =@TABLE_NAME AND TABLE_SCHEMA= @TABLE_SCHEMA
+	FOR XML PATH('') ) ,1,1,'')
+	+' FROM ' + @TABLE_SCHEMA+'.'+ @TABLE_NAME SELECTQUERY
+
+end
+go
+--------------------------------------------------------------------------------------------------------------------------------------
+IF OBJECT_ID(N'dbo.SP_I', N'P') IS NOT NULL
+BEGIN
+	drop proc dbo.SP_I
+END
+GO 
+-- write insert statement with columns using schema.table as parameter
+CREATE proc SP_I  
+@P1 varchar(200)  
+as  
+begin   
+    
+	--DECLARE @P1 VARCHAR(100)
+ 
+	--SET @P1='APIRPT.LEDGERSUMMARY'
+ 
+	DECLARE @TABLE_NAME VARCHAR (100), @TABLE_SCHEMA VARCHAR(100) 
+ 
+	SET @TABLE_SCHEMA= SUBSTRING (@P1, 0, CHARINDEX('.', @P1))
+	SET @TABLE_SCHEMA = IIF(isnull(@TABLE_SCHEMA,'')='','DBO','') 
+
+	SET @TABLE_NAME= SUBSTRING (@P1, CHARINDEX('.',@P1) +1,LEN (@P1)) 
+ 
+	 -- SP_I 
+	SELECT 'INSERT INTO '+ @TABLE_SCHEMA +'.'+ @TABLE_NAME + ' ( ' + STUFF ((SELECT ',', +IIF(ISNUMERIC(SUBSTRING (COLUMN_NAME, 1, 1))=1, '[' +COLUMN_NAME, COLUMN_NAME) + IIF(ISNUMERIC(SUBSTRING (COLUMN_NAME, 1, 1))=1, ']', '') 
+	FROM INFORMATION_SCHEMA.COLUMNS
+	WHERE TABLE_NAME = @TABLE_NAME AND TABLE_SCHEMA=@TABLE_SCHEMA 
+	FOR XML PATH('')),1,1,'')  + ' ) '+ CHAR(10)   + 
+	+ 'SELECT '+ STUFF ( (SELECT ',' + IIF(ISNUMERIC(SUBSTRING (COLUMN_NAME, 1, 1))=1, '[' +COLUMN_NAME, COLUMN_NAME) + IIF(ISNUMERIC(SUBSTRING (COLUMN_NAME, 1, 1))=1, ']', '') 
+	FROM INFORMATION_SCHEMA.COLUMNS
+	WHERE TABLE_NAME =@TABLE_NAME AND TABLE_SCHEMA= @TABLE_SCHEMA
+	FOR XML PATH('') ) ,1,1,'') + '' INSERTQUERY
+
+end
+go 
+IF OBJECT_ID(N'dbo.sp_u', N'P') IS NOT NULL
+BEGIN
+	drop proc dbo.sp_u
+END
+GO 
+--------------------------------------------------------------------------------------------------------------------------------------
+-- write update statement with columns using schema.table as parameter
+CREATE proc sp_u  
+@P1 varchar(200)  
+as  
+begin   
+    
+	--DECLARE @P1 VARCHAR(100)
+ 
+	--SET @P1='APIRPT.LEDGERSUMMARY'
+ 
+	DECLARE @TABLE_NAME VARCHAR (100), @TABLE_SCHEMA VARCHAR(100) 
+ 
+	SET @TABLE_SCHEMA= SUBSTRING (@P1, 0, CHARINDEX('.', @P1))
+	SET @TABLE_SCHEMA = IIF(isnull(@TABLE_SCHEMA,'')='','DBO','') 
+
+	SET @TABLE_NAME= SUBSTRING (@P1, CHARINDEX('.',@P1) +1,LEN (@P1)) 
+ 
+
+	--SP_U 
+	SELECT 'UPDATE ' + @TABLE_SCHEMA+ '.' + @TABLE_NAME +' SET ' +
+	STUFF ( (SELECT '='''', ' + IIF(ISNUMERIC(SUBSTRING (COLUMN_NAME, 1, 1))=1, '[' +COLUMN_NAME, COLUMN_NAME) + IIF(ISNUMERIC(SUBSTRING (COLUMN_NAME, 1, 1))=1, ']', '') 
+	FROM INFORMATION_SCHEMA.COLUMNS 
+	WHERE TABLE_NAME= @TABLE_NAME AND TABLE_SCHEMA=@TABLE_SCHEMA 
+	FOR XML PATH('') ),1,4,'') +  '='''''  +CHAR(10)+
+	' WHERE ID= -101 ' UPDATEQUERY 
+
+end
+go 
+--------------------------------------------------------------------------------------------------------------------------------------
 -- Creating temp table 
 drop table if exists #t1
 create table #t1 (slno int identity(1,1),companydetailid int unique ) 
