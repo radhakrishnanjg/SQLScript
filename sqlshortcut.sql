@@ -358,3 +358,29 @@ BEGIN
 
 END
 go  
+-------------------------------------------------------------------------------------------------------------------------------------- 
+	-- Example for Merge into with insert, Update and Delete
+		MERGE ZOHO.Leads AS ST
+		USING #t1	AS S
+		ON S.id = ST.id 
+		 --For Inserts
+		WHEN NOT MATCHED BY Target THEN
+			INSERT (CompanyId,Email,Store_Name,SellerName,POC_Name,Lead_Status,
+			Modified_Date,First_Name,Last_Name,Company,Phone_Number,
+			Owners,Secondary_Email,Lead_Source,Channel,Leads_Priority,
+			WechatName_ID,We_Chat_Group,Created_Date,Leads_Country,Remarks,
+			Lifetime_GMV,Source,id,Modified_Date1,CreatedDate,CreatedBy) 
+			VALUES (@CompanyId,S.Email,S.Store_Name,S.SellerName,S.POC_Name,S.Lead_Status,S.
+			Modified_Date,S.First_Name,S.Last_Name,S.Company,S.Phone_Number,S.
+			Owners,S.Secondary_Email,S.Lead_Source,S.Channel,S.Leads_Priority,S.
+			WechatName_ID,S.We_Chat_Group,S.Created_Date,S.Leads_Country,S.Remarks,S.
+			Lifetime_GMV,S.Source,S.id,S.Modified_Date1,getdate(),@LoginId) 
+		 --For Updates
+		WHEN MATCHED THEN UPDATE SET
+			ST.UpdatedDate= getdate(),
+			ST.Email= S.Email,
+			ST.Store_Name=S.Store_Name , 
+			ST.Modified_Date1=S.Modified_Date1 
+		 --For Deletes
+		WHEN NOT MATCHED BY source THEN
+			DELETE;
