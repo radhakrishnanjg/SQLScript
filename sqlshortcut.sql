@@ -53,6 +53,16 @@ begin
 	C3 Datetime)
 end 
 --------------------------------------------------------------------------------------------------------------------------------------
+-- checking values before insert
+IF NOT EXISTS(SELECT 1 FROM gstapi.AuthToken where ClientId='A')
+begin
+	
+	insert into  gstapi.AuthToken (CompanyId,ClientId,UserName,AuthToken
+	,Sek,TokenExpiry,CreatedDate)
+	select 4 CompanyId, 'A' ClientId,'nsdlTest' UserName,'A' AuthToken,
+	'A+TKAieHfz1OcH2jFzAVZUUiTl6QwgoG8/ZmsiMDrMiq0YMT81ux' Sek,'2023-07-04 20:14:47' TokenExpiry,getdate() CreatedDate
+end
+--------------------------------------------------------------------------------------------------------------------------------------
 -- Schema checking
 IF EXISTS(SELECT 1 FROM INFORMATION_SCHEMA.columns where TABLE_SCHEMA='Amazon')
 begin
