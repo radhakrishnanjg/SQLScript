@@ -394,3 +394,10 @@ go
 		 --For Deletes
 		WHEN NOT MATCHED BY source THEN
 			DELETE;
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+-- To check the dependent or  text by in all store proc or all sql object except table
+SELECT * FROM SYS.objects
+WHERE OBJECT_DEFINITION(OBJECT_ID) LIKE '%RK%'
+AND TYPE='P'
+
+---------------------------------------------
