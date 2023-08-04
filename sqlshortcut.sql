@@ -70,11 +70,11 @@ begin
 end 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- checking column
-IF NOT EXISTS(SELECT 1 FROM INFORMATION_SCHEMA.columns WHERE table_Name = 'IORExpense' 
-and TABLE_SCHEMA='Payment' and COLUMN_NAME='ApprovalStatus')
+IF NOT EXISTS(SELECT 1 FROM INFORMATION_SCHEMA.columns WHERE 1=1
+and TABLE_SCHEMA='Product' and table_Name = 'AmazonProductTaxCode' and COLUMN_NAME='FileID')
 begin
-	alter table Payment.IORExpense
-	add ApprovalStatus varchar(20)
+	alter table Product.AmazonProductTaxCode
+	add FileID Bigint
 end
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Checking Primary Key 
