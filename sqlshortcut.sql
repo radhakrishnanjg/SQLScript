@@ -400,4 +400,16 @@ SELECT * FROM SYS.objects
 WHERE OBJECT_DEFINITION(OBJECT_ID) LIKE '%RK%'
 AND TYPE='P'
 
----------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Delete duplicate records using the CTE
+with CTE as (
+
+select id
+,row_number() over ( partition by  taskid,CommandID,ExecutableParam order by taskid,CommandID,ExecutableParam  ) R  from ETL.DS_ETLCommands 
+where 1=1
+--and taskid=35
+--group by taskid,CommandID,ExecutableParam
+--having count(*)>1
+) 
+select * from CTE where R = 1
+-------------------------------------------------------------------------------------------------------------------------------------------------------
