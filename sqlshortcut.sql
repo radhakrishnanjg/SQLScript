@@ -105,7 +105,7 @@ as
 begin    
   
 	select   'sp_helptext ''' +  s.name + '.'+ t.name  + '''' FROM sys.procedures as t   
-	inner join sys.schemas s on s.schema_id=t.schema_id where   t.name like '%'+ @tbl +'%'   
+	inner join sys.schemas s on s.schema_id=t.schema_id where   t.name like '%'+ @tbl +'%'     or s.name like '%'+ @tbl +'%' 
 
 end
 go
@@ -117,7 +117,7 @@ as
 begin   
     
 	select   'select top 3  * from ' +  s.name + '.'+ t.name + ' ORDER BY  1 DESC ' FROM sys.tables as t   
-	inner join sys.schemas s on s.schema_id=t.schema_id where   t.name like '%'+ @tbl +'%'   
+	inner join sys.schemas s on s.schema_id=t.schema_id where   t.name like '%'+ @tbl +'%'   or s.name like '%'+ @tbl +'%' 
 
 end
 --------------------------------------------------------------------------------------------------------------------------------------
@@ -413,3 +413,37 @@ where 1=1
 ) 
 select * from CTE where R = 1
 -------------------------------------------------------------------------------------------------------------------------------------------------------
+-- JSON to table Query
+IF OBJECT_ID(N'sp_jsont', N'P') IS NOT NULL
+BEGIN
+	drop proc sp_jsont
+END
+go 
+-- exec sp_jsont 'Testtable', '{"Name": "John", "Age": 30, "IsStudent": true, "GPA": 3.5}'
+CREATE proc sp_jsont
+@tableName NVARCHAR(100),
+@json varchar(max)  
+as  
+begin    
+   
+ 
+	DECLARE @sql NVARCHAR(MAX) =   ''
+	set @sql =  'CREATE TABLE ' + @tableName + ' (' ;
+
+	set  @sql +=  ( SELECT 
+				STRING_AGG ( QUOTENAME([key])  +
+				CASE 
+					WHEN ISNUMERIC(JSON_VALUE(@json, CONCAT('$.', [key]))) = 1 AND JSON_VALUE(@json, CONCAT('$.', [key])) like '%.%' THEN ' DECIMAL(18,2)'
+					WHEN ISNUMERIC(JSON_VALUE(@json, CONCAT('$.', [key]))) = 1 THEN ' INT'
+					WHEN LOWER(value) IN ('true', 'false') THEN ' BIT'
+					ELSE ' VARCHAR(255)'
+				END,',') 
+				FROM OPENJSON(@json)
+			 ) 
+
+	set  @sql += ')'  
+
+	select @sql
+
+end
+go
