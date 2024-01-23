@@ -77,6 +77,14 @@ begin
 	add FileID Bigint
 end
 --------------------------------------------------------------------------------------------------------------------------------------
+-- checking column to delete 
+IF EXISTS(SELECT 1 FROM INFORMATION_SCHEMA.columns WHERE 1=1
+and TABLE_SCHEMA='Product' and table_Name = 'AmazonProductTaxCode' and COLUMN_NAME='FileID')
+begin
+	alter table Product.AmazonProductTaxCode
+	DROP COLUMN FileID  
+end
+--------------------------------------------------------------------------------------------------------------------------------------
 -- Checking Primary Key 
 IF NOT EXISTS(SELECT 1 FROM sys.key_constraints WHERE type = 'PK'   and name='PK_Roles')
 begin
