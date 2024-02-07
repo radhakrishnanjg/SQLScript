@@ -50,7 +50,9 @@ begin
 	SysID int identity (1,1) not null,
 	C1 varchar(100),
 	C2 varchar(100),
-	C3 Datetime)
+	C3 Datetime,
+	CreatedBy int,
+	CreatedDate datetime)
 end 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- checking values before insert
