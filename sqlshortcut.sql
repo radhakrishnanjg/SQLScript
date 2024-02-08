@@ -438,7 +438,8 @@ CREATE proc sp_jsont
 @json varchar(max)  
 as  
 begin    
-   
+   	--set @tableName		='Testtable'
+	--set @json			='{"Name": "John", "Age": 30, "IsStudent": true, "GPA": 3.5}'
  
 	DECLARE @sql NVARCHAR(MAX) =   ''
 	set @sql =  'CREATE TABLE ' + @tableName + ' (' ;
