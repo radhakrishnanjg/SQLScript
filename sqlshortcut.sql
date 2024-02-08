@@ -457,3 +457,21 @@ begin
 
 end
 go
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+--How to add description into particular column in MS SQL using extended_properties
+EXEC sp_addextendedproperty 
+    @name = N'TaxSch', @value = 'Tax Scheme',
+    @level0type = N'Schema',   @level0name = 'EInvoice',
+    @level1type = N'Table',    @level1name = 'TranDtls',
+    @level2type = N'Column',   @level2name = 'TaxSch';
+GO
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+-- How to display the column's description in MS SQL using extended_properties
+	select 	st.name [Table],sc.name [Column],sep.value [Description]
+	from sys.tables st
+	inner join sys.columns sc on st.object_id = sc.object_id
+	left join sys.extended_properties sep on st.object_id = sep.major_id
+	and sc.column_id = sep.minor_id 
+	where st.name = 'TranDtls' 
+GO
