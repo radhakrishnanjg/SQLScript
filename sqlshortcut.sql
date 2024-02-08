@@ -115,7 +115,8 @@ as
 begin    
   
 	select   'sp_helptext ''' +  s.name + '.'+ t.name  + '''' FROM sys.procedures as t   
-	inner join sys.schemas s on s.schema_id=t.schema_id where   t.name like '%'+ @tbl +'%'     or s.name like '%'+ @tbl +'%' 
+	inner join sys.schemas s on s.schema_id=t.schema_id 
+	where   t.name like '%'+ @tbl +'%'     or s.name like '%'+ @tbl +'%' 
 
 end
 go
@@ -126,8 +127,9 @@ CREATE proc sp_t
 as  
 begin   
     
-	select   'select top 3  * from ' +  s.name + '.'+ t.name + ' ORDER BY  1 DESC ' FROM sys.tables as t   
-	inner join sys.schemas s on s.schema_id=t.schema_id where   t.name like '%'+ @tbl +'%'   or s.name like '%'+ @tbl +'%' 
+	select   'select top 3  * from ' +  s.name + '.'+ t.name + ' order by 1 desc ' FROM sys.tables as t   
+	inner join sys.schemas s on s.schema_id=t.schema_id 
+	where   t.name like '%'+ @tbl +'%'   or s.name like '%'+ @tbl +'%' 
 
 end
 --------------------------------------------------------------------------------------------------------------------------------------
@@ -168,7 +170,7 @@ BEGIN
 END
 GO 
 -- write insert statement with columns using schema.table as parameter
-CREATE proc SP_I  
+CREATE proc sp_i  
 @P1 varchar(200)  
 as  
 begin   
@@ -185,7 +187,8 @@ begin
 	SET @TABLE_NAME= SUBSTRING (@P1, CHARINDEX('.',@P1) +1,LEN (@P1)) 
  
 	 -- SP_I 
-	SELECT 'INSERT INTO '+ @TABLE_SCHEMA +'.'+ @TABLE_NAME + ' ( ' + STUFF ((SELECT ',', +IIF(ISNUMERIC(SUBSTRING (COLUMN_NAME, 1, 1))=1, '[' +COLUMN_NAME, COLUMN_NAME) + IIF(ISNUMERIC(SUBSTRING (COLUMN_NAME, 1, 1))=1, ']', '') 
+	SELECT 'INSERT INTO '+ @TABLE_SCHEMA +'.'+ @TABLE_NAME + ' ( ' + STUFF ((SELECT ',', +IIF(ISNUMERIC(SUBSTRING (COLUMN_NAME, 1, 1))=1, 
+	'[' +COLUMN_NAME, COLUMN_NAME) + IIF(ISNUMERIC(SUBSTRING (COLUMN_NAME, 1, 1))=1, ']', '') 
 	FROM INFORMATION_SCHEMA.COLUMNS
 	WHERE TABLE_NAME = @TABLE_NAME AND TABLE_SCHEMA=@TABLE_SCHEMA 
 	FOR XML PATH('')),1,1,'')  + ' ) '+ CHAR(10)   + 
@@ -220,7 +223,7 @@ begin
 	SET @TABLE_NAME= SUBSTRING (@P1, CHARINDEX('.',@P1) +1,LEN (@P1)) 
  
 
-	--SP_U 
+	--sp_u 
 	SELECT 'UPDATE ' + @TABLE_SCHEMA+ '.' + @TABLE_NAME +' SET ' +
 	STUFF ( (SELECT '='''', ' + IIF(ISNUMERIC(SUBSTRING (COLUMN_NAME, 1, 1))=1, '[' +COLUMN_NAME, COLUMN_NAME) + IIF(ISNUMERIC(SUBSTRING (COLUMN_NAME, 1, 1))=1, ']', '') 
 	FROM INFORMATION_SCHEMA.COLUMNS 
