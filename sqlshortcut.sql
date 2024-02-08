@@ -460,6 +460,64 @@ begin
 	select @sql
 
 end
+go 
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+-- POC for nested json into nested tables
+declare
+@tableName NVARCHAR(100),
+@json varchar(max)   
+begin    
+
+   	set @tableName		='Testtable'
+	set @json			='{
+    "InvRm": "TEST",
+    "DocPerdDtls": {
+        "InvStDt": "01/08/2020",
+        "InvEndDt": "01/09/2020"
+    },
+    "PrecDocDtls": [
+        {
+            "InvNo": "DOC/002",
+            "InvDt": "01/08/2020",
+            "OthRefNo": "123456"
+        }
+    ],
+    "ContrDtls": [
+        {
+            "RecAdvRefr": "Doc/003",
+            "RecAdvDt": "01/08/2020",
+            "TendRefr": "Abc001",
+            "ContrRefr": "Co123",
+            "ExtRefr": "Yo456",
+            "ProjRefr": "Doc-456",
+            "PORefr": "Doc-789",
+            "PORefDt": "01/08/2020"
+        }
+    ]
+}'
+ 
+ select * from   OPENJSON(@json)
+	DECLARE @sql NVARCHAR(MAX) =   ''
+	set @sql =  'CREATE TABLE ' + @tableName + ' (' ;
+
+	set  @sql +=  ( SELECT 
+				STRING_AGG ( QUOTENAME([key])  +
+				CASE 
+					WHEN ISJSON([value]) = 1 and type =5  THEN 'NVARCHAR(MAX)'
+					WHEN ISJSON(substring(trim([value]),1,len(trim([value])))) = 1 and type =4  THEN 'NVARCHAR(MAX)'
+					WHEN ISNUMERIC(JSON_VALUE(@json, CONCAT('$.', [key]))) = 1 AND JSON_VALUE(@json, CONCAT('$.', [key])) like '%.%' THEN ' DECIMAL(18,2)'
+					WHEN ISNUMERIC(JSON_VALUE(@json, CONCAT('$.', [key]))) = 1 THEN ' INT'
+					WHEN LOWER(value) IN ('true', 'false') THEN ' BIT'
+					ELSE ' VARCHAR(255)'
+				END,',') 
+				FROM OPENJSON(@json)
+			 ) 
+
+	set  @sql += ')'  
+
+	select @sql
+
+end 
 go
 -------------------------------------------------------------------------------------------------------------------------------------------------------
 --How to add description into particular column in MS SQL using extended_properties
