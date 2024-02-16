@@ -519,6 +519,76 @@ begin
 
 end 
 go
+------------------------------------------------------------------------------------------------------------------------------------------------------
+Create function f_nj2t(
+@tableName NVARCHAR(100),
+@json varchar(max))
+RETURNS varchar(max)
+as  
+begin     
+	DECLARE @sql NVARCHAR(MAX) =   ''
+	set @sql =   'CREATE TABLE ' + @tableName + ' (' ;
+	--declare @i varchar(10)=''
+	--set @i+='|' 
+	set  @sql +=  ( SELECT 
+				STRING_AGG ( iif( (ISJSON([value]) = 1 and type =5) or (ISJSON([value]) = 1 and type =4),'',([key]))
+							  +    
+				CASE  
+					WHEN ISJSON([value]) = 1 and type =5  THEN dbo.f_nj2t(@tableName + '|' + [key],[value]) 
+					WHEN ISJSON([value]) = 1 and type =4  THEN dbo.f_nj2t( @tableName + '|' + [key],substring(trim([value]),2,len(trim([value])) - 2))
+				 	WHEN isDate(JSON_VALUE(@json, CONCAT('$.', [key]))) = 1 AND len(JSON_VALUE(@json, CONCAT('$.', [key]))) = 10 THEN ' date'
+				 	WHEN isDate(JSON_VALUE(@json, CONCAT('$.', [key]))) = 1 AND len(JSON_VALUE(@json, CONCAT('$.', [key]))) > 10 THEN ' datetime'
+					WHEN ISNUMERIC(JSON_VALUE(@json, CONCAT('$.', [key]))) = 1 AND JSON_VALUE(@json, CONCAT('$.', [key])) like '%.%' THEN ' DECIMAL(18,2)'
+					WHEN ISNUMERIC(JSON_VALUE(@json, CONCAT('$.', [key]))) = 1 THEN ' INT'
+					WHEN LOWER(value) IN ('true', 'false') THEN ' BIT'
+					ELSE ' VARCHAR(255)'
+				END,',') 
+				FROM OPENJSON(@json)  
+			 ) 
+
+	set  @sql += ')'  
+
+	--set @sql= replace(@sql,',);',');')
+
+ 
+	if(@sql like '%|%')
+		set @sql= replace(@sql,'|','_')
+
+	return @sql
+
+end
+--- Testing nested Json
+declare
+@tableName NVARCHAR(100),
+@json varchar(max)    
+
+   	set @tableName		='Testtable'
+	set @json			='{
+    "InvRm": "TEST",
+    "DocPerdDtls": {
+        "A_Date": "01/08/2020",
+        "A_DateTime": "01/08/2020 11:00"
+    },
+    "PrecDocDtls": [
+        {
+            "B": "DOC/002"
+        }
+    ],
+    "ContrDtls": [
+        {
+            "C": 1,
+            "FinalChild": [
+                {
+                    "D": 1.00,
+                    "E": false,
+                    "RecAdvRefr_": "Doc/003"
+                }
+            ]
+        }
+    ]
+}'   
+ select  dbo.f_nj2t(@tableName,@json)  
+go 	
 -------------------------------------------------------------------------------------------------------------------------------------------------------
 --How to add description into particular column in MS SQL using extended_properties
 EXEC sp_addextendedproperty 
