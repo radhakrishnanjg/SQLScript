@@ -607,3 +607,54 @@ GO
 	and sc.column_id = sep.minor_id 
 	where st.name = 'TranDtls' 
 GO
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--sample table
+--create table aaa_
+--( 
+--c1 varchar (max),
+--c2 varchar (10),
+--c3 char (10),
+--c4 nvarchar (10),
+--c5 nchar (10),
+
+--c6 date,
+--c7 datetime,
+--c8 tinyint,
+--c9 smallint,
+--c10 int,
+--c11 decimal(18,2)
+--)
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- To get select statement for staging table into raw table
+DECLARE @SchemaName NVARCHAR (100)
+DECLARE @tblName NVARCHAR (100) 
+DECLARE @stgTblAlias VARCHAR (15)
+
+SET @SchemaName =N'dbo'
+SET @tblName =N'aaa_'
+
+SET @stgTblAlias='stg' 
+SELECT COLUMN_NAME,IS_NULLABLE,DATA_TYPE,CHARACTER_MAXIMUM_LENGTH,ORDINAL_POSITION,NUMERIC_PRECISION,NUMERIC_SCALE
+,sqlStmt= '' + 
+CASE    
+	WHEN DATA_TYPE ='varchar'	AND sc.CHARACTER_MAXIMUM_LENGTH =-1 THEN 'TRIM('+@stgTblAlias+'.['+sc.COLUMN_NAME +'])  AS ['+ sc.COLUMN_NAME  + '],'
+	WHEN DATA_TYPE ='varchar'	THEN 'SUBSTRING(TRIM('+@stgTblAlias+'.['+sc.COLUMN_NAME +']), 1, '+cast (sc.CHARACTER_MAXIMUM_LENGTH  as varchar)+' )  AS ['+ sc.COLUMN_NAME  + '],'
+	WHEN DATA_TYPE ='char'	THEN 'SUBSTRING(TRIM('+@stgTblAlias+'.['+sc.COLUMN_NAME +']), 1, '+cast (sc.CHARACTER_MAXIMUM_LENGTH  as varchar)+' )  AS ['+ sc.COLUMN_NAME  + '],' 
+	WHEN DATA_TYPE ='nvarchar'	THEN 'SUBSTRING(TRIM('+@stgTblAlias+'.['+sc.COLUMN_NAME +']), 1, '+cast (sc.CHARACTER_MAXIMUM_LENGTH/2  as varchar)+' )  AS ['+ sc.COLUMN_NAME  + '],'
+	WHEN DATA_TYPE ='nchar'	THEN 'SUBSTRING(TRIM('+@stgTblAlias+'.['+sc.COLUMN_NAME +']), 1, '+cast (sc.CHARACTER_MAXIMUM_LENGTH/2  as varchar)+' )  AS ['+ sc.COLUMN_NAME  + '],' 
+
+	WHEN DATA_TYPE ='date'		THEN 'CASE WHEN ISDATE('+@stgTblAlias+'.['+sc.COLUMN_NAME +'])= 0 THEN NULL ELSE cast ('+@stgTblAlias+'.['+sc.COLUMN_NAME +'] as Date) END' + ' AS ['+ sc.COLUMN_NAME  + '],' 
+	WHEN DATA_TYPE ='Datetime'	THEN 'CASE WHEN ISDATE('+@stgTblAlias+'.['+sc.COLUMN_NAME +'])= 0 THEN NULL ELSE cast ('+@stgTblAlias+'.['+sc.COLUMN_NAME +'] as Datetime) END' + ' AS ['+ sc.COLUMN_NAME  + '],' 
+
+	WHEN DATA_TYPE ='tinyint'	THEN 'CASE WHEN isnumeric('+@stgTblAlias+'.['+sc.COLUMN_NAME +'])= 0 THEN NULL ELSE cast ('+@stgTblAlias+'.['+sc.COLUMN_NAME +'] as tinyint) END' + ' AS ['+ sc.COLUMN_NAME  + '],' 
+	WHEN DATA_TYPE ='smallint'	THEN 'CASE WHEN isnumeric('+@stgTblAlias+'.['+sc.COLUMN_NAME +'])= 0 THEN NULL ELSE cast ('+@stgTblAlias+'.['+sc.COLUMN_NAME +'] as smallint) END' + ' AS ['+ sc.COLUMN_NAME  + '],' 
+	WHEN DATA_TYPE ='int'		THEN 'CASE WHEN isnumeric('+@stgTblAlias+'.['+sc.COLUMN_NAME +'])= 0 THEN NULL ELSE cast ('+@stgTblAlias+'.['+sc.COLUMN_NAME +'] as int) END' + ' AS ['+ sc.COLUMN_NAME  + '],' 
+	WHEN DATA_TYPE ='decimal'	THEN 'CASE WHEN isnumeric('+@stgTblAlias+'.['+sc.COLUMN_NAME +'])= 0 THEN NULL ELSE cast ('+@stgTblAlias+'.['+sc.COLUMN_NAME +'] as decimal('+cast (sc.NUMERIC_PRECISION as varchar)+ ',' +cast (NUMERIC_SCALE as varchar)+ ')) END' + ' AS ['+ sc.COLUMN_NAME  + '],' 
+	END 
+FROM INFORMATION_SCHEMA.COLUMNS  as sc
+WHERE 1=1
+AND TABLE_SCHEMA=@SchemaName AND TABLE_NAME = @tblName
+AND COLUMN_NAME NOT IN ('ID','CREATEDDATE')
+ORDER BY  ORDINAL_POSITION asc 
+
+
