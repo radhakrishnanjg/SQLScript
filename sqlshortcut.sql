@@ -132,6 +132,15 @@ begin
 	where   t.name like '%'+ @tbl +'%'   or s.name like '%'+ @tbl +'%' 
 
 end
+---------------------------------------------------------------------------------------------------------------------------------------
+-- Error Log table
+insert into  Register.ErrorLog(CompanyDetailID,ScreenName,UniqueNumber,ErrorMessage,CreatedDate)
+select  @CompanyDetailID,'DBS Confirmation - Failed'+'',null,ERROR_MESSAGE(),GETDATE()
+-- Select
+select * from Register.ErrorLog with(nolock)
+where 1=1
+and ScreenName like '%DBS Confirmation%' 
+order by 1 desc 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- write select statement with columns using schema.table  as parameter
 IF OBJECT_ID(N'dbo.sp_se', N'P') IS NOT NULL
