@@ -529,6 +529,11 @@ begin
 end 
 go
 ------------------------------------------------------------------------------------------------------------------------------------------------------
+IF OBJECT_ID(N'f_nj2t', N'FN') IS NOT NULL
+BEGIN
+	drop function f_nj2t
+END
+go 
 Create function f_nj2t(
 @tableName NVARCHAR(100),
 @json varchar(max))
@@ -536,9 +541,7 @@ RETURNS varchar(max)
 as  
 begin     
 	DECLARE @sql NVARCHAR(MAX) =   ''
-	set @sql =   'CREATE TABLE ' + @tableName + ' (' ;
-	--declare @i varchar(10)=''
-	--set @i+='|' 
+	set @sql =    CHAR(13) + CHAR(10) + 'CREATE TABLE ' + @tableName + ' (' ; 
 	set  @sql +=  ( SELECT 
 				STRING_AGG ( iif( (ISJSON([value]) = 1 and type =5) or (ISJSON([value]) = 1 and type =4),'',([key]))
 							  +    
@@ -550,22 +553,24 @@ begin
 					WHEN ISNUMERIC(JSON_VALUE(@json, CONCAT('$.', [key]))) = 1 AND JSON_VALUE(@json, CONCAT('$.', [key])) like '%.%' THEN ' DECIMAL(18,2)'
 					WHEN ISNUMERIC(JSON_VALUE(@json, CONCAT('$.', [key]))) = 1 THEN ' INT'
 					WHEN LOWER(value) IN ('true', 'false') THEN ' BIT'
-					ELSE ' VARCHAR(255)'
-				END,',') 
+					ELSE ' VARCHAR(255)' 
+				END,',' +  CHAR(13) + CHAR(10)) 
 				FROM OPENJSON(@json)  
 			 ) 
 
 	set  @sql += ')'  
-
-	--set @sql= replace(@sql,',);',');')
-
+	 
  
 	if(@sql like '%|%')
+	begin
 		set @sql= replace(@sql,'|','_')
+	end
+		
 
 	return @sql
 
 end
+
 --- Testing nested Json
 declare
 @tableName NVARCHAR(100),
