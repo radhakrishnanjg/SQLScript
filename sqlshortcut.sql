@@ -540,10 +540,19 @@ Create function f_nj2t(
 RETURNS varchar(max)
 as  
 begin     
+
+	-- not working for order by 
+	declare @keyvalueparir as table  ([key] varchar(max),	[value]  varchar(max),	[type] int) 
+	insert into @keyvalueparir ([key],[value],[type])
+	select [key],[value],[type] FROM OPENJSON(@json)  
+	order by [type] desc
+	
+
+	--select * from @keyvalueparir
+
 	DECLARE @sql NVARCHAR(MAX) =   ''
 	set @sql =    CHAR(13) + CHAR(10) + 'CREATE TABLE ' + @tableName + ' (' ; 
-	set  @sql +=  ( SELECT 
-				STRING_AGG ( iif( (ISJSON([value]) = 1 and type =5) or (ISJSON([value]) = 1 and type =4),'',([key]))
+	set  @sql +=  ( select STRING_AGG ( iif( (ISJSON([value]) = 1 and type =5) or (ISJSON([value]) = 1 and type =4),'',([key]))
 							  +    
 				CASE  
 					WHEN ISJSON([value]) = 1 and type =5  THEN dbo.f_nj2t(@tableName + '|' + [key],[value]) 
@@ -554,8 +563,15 @@ begin
 					WHEN ISNUMERIC(JSON_VALUE(@json, CONCAT('$.', [key]))) = 1 THEN ' INT'
 					WHEN LOWER(value) IN ('true', 'false') THEN ' BIT'
 					ELSE ' VARCHAR(255)' 
-				END,',' +  CHAR(13) + CHAR(10)) 
-				FROM OPENJSON(@json)  
+				END,',' +  CHAR(13) + CHAR(10))  
+				from 
+				( 
+					SELECT  [key],[value],[type]
+					,ROW_NUMBER() OVER (ORDER BY [type] asc) AS RowNum  --< ORDER BY
+					FROM @keyvalueparir     
+				)
+				as MyDerivedTable  
+				WHERE MyDerivedTable.RowNum BETWEEN 1 and 5 
 			 ) 
 
 	set  @sql += ')'  
@@ -570,6 +586,7 @@ begin
 	return @sql
 
 end
+
 
 --- Testing nested Json
 declare
