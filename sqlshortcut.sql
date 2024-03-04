@@ -472,13 +472,56 @@ end
 go 
 -------------------------------------------------------------------------------------------------------------------------------------------------------
 -- sample json with all types
+-- To insert the rows into tables from json 
 declare @tableName NVARCHAR(100),
 @json varchar(max)  
 
 set @tableName		='Testtable'
-set @json			='{"Name": "John", "Age": 30, "IsStudent": true, "GPA": 3.5,"GPAobject": {"a": 23213 },"GPAArray": [{"a": 23213 }]}'
+set @json			='{"Name": "John", "Age": 30, "IsStudent": true, "GPA": 3.5,"GPAobject": {"a": 1 ,"z": 2.00},"GPAArray": [{"a": 3 ,"z": 4.00}]}'
  
+
 SELECT  	*	FROM OPENJSON(@json)
+
+set @json			= concat('[',@json,']')
+ 
+declare @Name varchar(100)
+declare @Age int 
+declare @IsStudent bit 
+declare @GPA decimal(18,2)
+declare @GPAobject varchar(max)
+declare @GPAArray varchar(max)
+
+
+SET @Name=JSON_VALUE(@json,'$[0].Name');  
+SET @Age=JSON_VALUE(@json,'$[0].Age');  
+SET @IsStudent=JSON_VALUE(@json,'$[0].IsStudent');  
+SET @GPA=JSON_VALUE(@json,'$[0].GPA');  
+ 
+
+select  @Name Name,  @Age Age,  @IsStudent IsStudent,  @GPA GPA 
+ 
+	
+SET @GPAobject=JSON_query(@json,'$[0].GPAobject'); 
+ 
+SELECT a,z  FROM
+OPENJSON ( @GPAobject )  
+WITH (        
+	a	int				'$.a' ,
+	z	decimal(18,2)	'$.z' 
+) 
+
+SET @GPAArray=JSON_query(@json,'$[0].GPAArray');  
+
+SELECT a,z  FROM
+OPENJSON ( @GPAArray )  
+WITH (        
+	a	int				'$.a' ,
+	z	decimal(18,2)	'$.z' 
+) 
+	
+
+
+
 -------------------------------------------------------------------------------------------------------------------------------------------------------
 -- POC for nested json into nested tables
 declare
