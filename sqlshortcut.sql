@@ -471,6 +471,15 @@ begin
 end
 go 
 -------------------------------------------------------------------------------------------------------------------------------------------------------
+-- sample json with all types
+declare @tableName NVARCHAR(100),
+@json varchar(max)  
+
+set @tableName		='Testtable'
+set @json			='{"Name": "John", "Age": 30, "IsStudent": true, "GPA": 3.5,"GPAobject": {"a": 23213 },"GPAArray": [{"a": 23213 }]}'
+ 
+SELECT  	*	FROM OPENJSON(@json)
+-------------------------------------------------------------------------------------------------------------------------------------------------------
 -- POC for nested json into nested tables
 declare
 @tableName NVARCHAR(100),
@@ -542,10 +551,10 @@ as
 begin     
 
 	-- not working for order by 
-	declare @keyvalueparir as table  ([key] varchar(max),	[value]  varchar(max),	[type] int) 
-	insert into @keyvalueparir ([key],[value],[type])
-	select [key],[value],[type] FROM OPENJSON(@json)  
-	order by [type] desc
+	--declare @keyvalueparir as table  ([key] varchar(max),	[value]  varchar(max),	[type] int) 
+	--insert into @keyvalueparir ([key],[value],[type])
+	--select [key],[value],[type] FROM OPENJSON(@json)  
+	--order by [type] desc
 	
 
 	--select * from @keyvalueparir
@@ -568,10 +577,10 @@ begin
 				( 
 					SELECT  [key],[value],[type]
 					,ROW_NUMBER() OVER (ORDER BY [type] asc) AS RowNum  --< ORDER BY
-					FROM @keyvalueparir     
+					FROM OPENJSON(@json)       
 				)
 				as MyDerivedTable  
-				WHERE MyDerivedTable.RowNum BETWEEN 1 and 5 
+				WHERE MyDerivedTable.RowNum >=0
 			 ) 
 
 	set  @sql += ')'  
@@ -586,8 +595,6 @@ begin
 	return @sql
 
 end
-
-
 --- Testing nested Json
 declare
 @tableName NVARCHAR(100),
