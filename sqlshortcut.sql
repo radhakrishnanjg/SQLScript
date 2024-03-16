@@ -441,7 +441,7 @@ BEGIN
 	drop proc sp_jsont
 END
 go 
--- exec sp_jsont 'Testtable', '{"Name": "John", "Age": 30, "IsStudent": true, "GPA": 3.5}'
+-- exec sp_jsont 'Testtable', '{"Name": "John", "Age": 30, "IsStudent": true, "GPA": 3.5,"ewbD": "2020-08-05","ewbDt": "2020-08-05 15:18:00"}'
 CREATE proc sp_jsont
 @tableName NVARCHAR(100),
 @json varchar(max)  
@@ -458,6 +458,8 @@ begin
 				CASE 
 					WHEN ISNUMERIC(JSON_VALUE(@json, CONCAT('$.', [key]))) = 1 AND JSON_VALUE(@json, CONCAT('$.', [key])) like '%.%' THEN ' DECIMAL(18,2)'
 					WHEN ISNUMERIC(JSON_VALUE(@json, CONCAT('$.', [key]))) = 1 THEN ' INT'
+				 	WHEN isDate(JSON_VALUE(@json, CONCAT('$.', [key]))) = 1 AND len(JSON_VALUE(@json, CONCAT('$.', [key]))) = 10 THEN ' date'
+				 	WHEN isDate(JSON_VALUE(@json, CONCAT('$.', [key]))) = 1 AND len(JSON_VALUE(@json, CONCAT('$.', [key]))) > 10 THEN ' datetime'
 					WHEN LOWER(value) IN ('true', 'false') THEN ' BIT'
 					ELSE ' VARCHAR(255)'
 				END,',') 
