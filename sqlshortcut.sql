@@ -739,5 +739,36 @@ WHERE 1=1
 AND TABLE_SCHEMA=@SchemaName AND TABLE_NAME = @tblName
 AND COLUMN_NAME NOT IN ('ID','CREATEDDATE')
 ORDER BY  ORDINAL_POSITION asc 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Validating the Json with specifi property
+declare @JsonData varchar(max)
 
+set @JsonData='[
+    {
+        "CompanydetailID": "1687",
+        "Storename": "Britzgo",
+        "ItemCode": "BHA-1607-S",
+        "ProductTaxCode": "A_GEN_REDUCED"
+    } 
+]'
 
+drop table if exists #t_schema_error
+create table #t_schema_error (slno int ,Error varchar(1000)) 
+insert into #t_schema_error (slno,Error)
+SELECT distinct 1,CASE WHEN JSON_VALUE(value, '$.CompanyDetailID') IS   NULL THEN 'CompanyDetailID property does not exist and property(Header Column) is case sensitive!' ELSE '' END
+FROM OPENJSON(@JsonData)  
+union all
+SELECT distinct 2,CASE WHEN JSON_VALUE(value, '$.StoreName') IS   NULL THEN 'StoreName property does not exist and property(Header Column) is case sensitive!' ELSE '' END
+FROM OPENJSON(@JsonData) 
+union all
+SELECT distinct 3,CASE WHEN JSON_VALUE(value, '$.ItemCode') IS   NULL THEN 'ItemCode property does not exist and property(Header Column) is case sensitive! ' ELSE '' END
+FROM OPENJSON(@JsonData)
+union all
+SELECT distinct 4,CASE WHEN JSON_VALUE(value, '$.ProductTaxCode') IS   NULL THEN 'ProductTaxCode property does not exist and property(Header Column) is case sensitive!' ELSE '' END
+FROM OPENJSON(@JsonData)
+
+delete from #t_schema_error where isnull(Error,'')=''
+
+select * from #t_schema_error
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
