@@ -782,3 +782,25 @@ delete from #t_schema_error where isnull(Error,'')=''
 select * from #t_schema_error
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Validating the Json with specifi property other option like schema validation 
+drop table if exists #t1_headercolumns
+create table #t1_headercolumns (slno int identity(1,1),HeaderColumn varchar(100) unique ) 
+insert into #t1_headercolumns (HeaderColumn)
+select value from dbo.fn_Split('SUPPLYCODE,FILELOCATION,DOCUMENTTYPE,DOCUMENTNUMBER,DOCUMENTDATE,BUYERGSTIN,BUYERLEGALNAME
+,BUYERPOS,BUYERADDR1,BUYERADDR2,BUYERLOCATION,BUYERPINCODE,BUYERSTATE
+,SLNO,HSNCODE,QUANTITY,UNIT,UNITPRICE,GROSSAMOUNT,TAXABLEVALUE,GSTRATE,SGSTAMT_RS,CGSTAMT_RS,IGSTAMT_RS,ITEMTOTAL
+,TOTALTAXABLEVALUE,SGSTAMT,CGSTAMT,IGSTAMT,TOTALINVOICEVALUE',',') 
+
+--select  *from #t1_headercolumns
+
+drop table if exists #t_schema_error
+create table #t_schema_error (slno int identity(1,1),Error varchar(1000)) 
+
+--select * from #t_schema_error
+insert into #t_schema_error (Error)
+SELECT distinct  CASE WHEN JSON_VALUE(value, '$.' + HeaderColumn ) IS   NULL THEN HeaderColumn + ' property does not exist and property(Header Column) is case sensitive!' ELSE '' END
+FROM OPENJSON('[{"SupplyCode":"B2B","Filelocation":"","DocumentType":"Credit Note","DocumentNumber":"BLR7-C-53625","DocumentDate":"02/02/2024","BuyerGSTIN":"29ACYPA5997Q1Z6","BuyerLegalName":"MOGALA SREENIVASAMURTHY AMAR","BuyerPOS":"29","BuyerAddr1":"100 feet ring road","BuyerAddr2":"","BuyerLocation":"Bangalore","BuyerPinCode":"560029","BuyerState":"29","SlNo":"1","HSNCode":"85444299","Quantity":"2","Unit":"Nos","UnitPrice":"1016.1","GrossAmount":"2032.2","Taxablevalue":"2032.2","GSTRate":"18","SgstAmt_RS":"182.9","CgstAmt_RS":"182.9","IgstAmt_RS":"0","ItemTotal":"2398","TotalTaxablevalue":"2032.2","SgstAmt":"182.9","CgstAmt":"182.9","IgstAmt":"0","TotalInvoicevalue":"2398"},{"SupplyCode":"B2B","Filelocation":"","DocumentType":"Tax Invoice","DocumentNumber":"BLR7-365503","DocumentDate":"02/02/2024","BuyerGSTIN":"29ACYPA5997Q1Z6","BuyerLegalName":"MOGALA SREENIVASAMURTHY AMAR","BuyerPOS":"29","BuyerAddr1":"100 feet ring road","BuyerAddr2":"","BuyerLocation":"Bangalore","BuyerPinCode":"560029","BuyerState":"29","SlNo":"1","HSNCode":"85444299","Quantity":"2","Unit":"Nos","UnitPrice":"1016.1","GrossAmount":"2032.2","Taxablevalue":"2032.2","GSTRate":"18","SgstAmt_RS":"182.9","CgstAmt_RS":"182.9","IgstAmt_RS":"0","ItemTotal":"2398","TotalTaxablevalue":"2032.2","SgstAmt":"182.9","CgstAmt":"182.9","IgstAmt":"0","TotalInvoicevalue":"2398"}]') 
+cross join #t1_headercolumns
+
+select * from #t_schema_error
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
