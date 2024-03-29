@@ -804,3 +804,34 @@ cross join #t1_headercolumns
 
 select * from #t_schema_error
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Simple Json Insert into table from json array
+declare @json varchar(max)  
+ 
+set @json			='
+[
+ {
+  "Gstin": "29AAFCV5265N1ZK",
+  "LglNm": "VALUECART PRIVATE LIMITED",
+  "Addr1": "2ND FLOOR, 1\/1 VINAYAKA TOWERS, 1ST CROSS, GANDHINAGAR, ",
+  "Loc": "BANGALORE",
+  "Pin": 560009,
+  "Stcd": "29"
+ }
+]'
+ 
+
+
+insert into RKGST.GSTINDetail (CompanyID,Type,CreatedBy,CreatedDate,Gstin,LglNm,Addr1,Loc,Pin,Stcd) 
+SELECT  3 CompanyID,'Seller' as Type, 9999 CreatedBy,getdate() CreatedDate,Gstin,LglNm,Addr1,Loc,Pin,Stcd	
+FROM OPENJSON(@json)
+WITH (        
+	Gstin	varchar(250) '$.Gstin' ,
+	LglNm	varchar(250) '$.LglNm' ,
+	Addr1	varchar(250) '$.Addr1' ,
+	Loc		varchar(250) '$.Loc' ,
+	Pin		varchar(250) '$.Pin' ,
+	Stcd	varchar(250)	'$.Stcd' 
+);
+
+
+select * from RKGST.GSTINDetail
