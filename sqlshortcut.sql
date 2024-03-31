@@ -431,7 +431,17 @@ go
 SELECT * FROM SYS.objects
 WHERE OBJECT_DEFINITION(OBJECT_ID) LIKE '%RK%'
 AND TYPE='P'
-
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE proc sp_d     
+@tbl varchar(100)      
+as      
+begin       
+        
+	SELECT * FROM SYS.objects
+	WHERE 1=1
+	and OBJECT_DEFINITION(OBJECT_ID) like '%'+ @tbl +'%'  
+	AND TYPE='P'
+end 
 -------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Delete duplicate records using the CTE
 with CTE as (
