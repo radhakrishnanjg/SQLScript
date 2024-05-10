@@ -1,0 +1,45 @@
+
+Create an APP:
+	npx create-react-app my-app
+	
+	npx create-react-app my-app --template typescript
+	Using 
+		npm create vite@latest
+		project name : j2
+		select 1 framework : React
+react version
+	npm view react version
+start
+	npm start
+	npm run dev
+Required Npms
+	npm i react-router-dom
+	npm install prop-types --save 
+	npm i react-bootstrap bootstrap 
+	npm i react-icons --save
+	npm i axios 
+	npm i --save react-toastify
+	npm i crypto-js
+	npm i react-cookie
+	
+Create a directory
+	mkdir components 
+	mkdir components,pages
+	
+Create a file or  files
+	copy nul > file.jsx
+	
+	copy nul > file.tsx && copy nul > files.tsx
+	
+delete a file	
+	del file.jsx
+	
+	del *.tsx
+
+Java script expersion	
+	{`${step >= 1 ? 'active' : ''}`} 
+	style={{ paddingLeft: "20px"}}
+	
+	
+	protected route
+	

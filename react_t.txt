@@ -1,0 +1,49 @@
+
+Link  : https://www.youtube.com/watch?v=LMFAaNWmKII&list=PL_euSNU_eLbfuahgrm63xLCWfpl2MaTAr
+
+https://create-react-app.dev/docs/getting-started/
+
+
+States
+	UseStates
+	UseReducer
+	Context API
+	 
+useParams	
+	The useParams hook returns an object of key/value pairs of the dynamic params from the current URL 
+	that were matched by the <Route path>
+	
+useSearchParams 
+	used to read and modify the query string in the URL for the current location
+	
+useNavigation 
+	tells you everything you need to know about a page navigation to build pending navigation indicators 
+	and optimistic UI on data mutations. 
+Hooks
+useState
+	The React useState Hook allows us to track state in a function component. 
+	State generally refers to data or properties that need to be tracking in an application. 
+
+useContext 
+	React Context is a way to manage state globally.
+	It can be used together with the useState Hook to share state between deeply nested components more 
+	easily than with useState alone.
+	
+useReducer
+	The useReducer Hook is similar to the useState Hook.
+	It allows for custom state logic. 
+	If you find yourself keeping track of multiple pieces of state that rely on complex logic, useReducer may be useful.
+
+useEffect
+	The useEffect Hook allows you to perform side effects in your components.
+	Some examples of side effects are: fetching data, directly updating the DOM, and timers.
+	
+useRef
+
+useCallback
+
+useMemo
+
+useTransition
+
+useDeferredValue
