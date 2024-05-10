@@ -14,7 +14,7 @@ start
 	npm run dev
 Required Npms
 	npm i react-router-dom
-	npm install prop-types --save 
+	npm i prop-types --save 
 	npm i react-bootstrap bootstrap 
 	npm i react-icons --save
 	npm i axios 
@@ -43,3 +43,29 @@ Java script expersion
 	
 	protected route
 	
+	
+	import axios from "axios";
+
+export default axios.create({
+  baseURL: "https://apitest.jennifer-in.com/api/",
+  // baseURL: "http://localhost:58031/api/",
+});
+
+
+import api from "./api";
+
+export function getRequest(URL, headers = null) {
+  return api.get(`/${URL}`, { headers }).then((response) => response);
+}
+
+export function postRequest(URL, payload, headers = null) {
+  return api.post(`/${URL}`, payload, { headers }).then((response) => response);
+}
+
+export function patchRequest(URL, payload) {
+  return api.patch(`/${URL}`, payload).then((response) => response);
+}
+
+export function deleteRequest(URL) {
+  return api.delete(`/${URL}`).then((response) => response);
+}
