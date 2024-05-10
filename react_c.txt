@@ -46,8 +46,7 @@ Java script expersion
 	
 	import axios from "axios";
 
-export default axios.create({
-  baseURL: "https://apitest.jennifer-in.com/api/",
+export default axios.create({ 
   // baseURL: "http://localhost:58031/api/",
 });
 
