@@ -21,6 +21,25 @@ Required Npms
 	npm i --save react-toastify
 	npm i crypto-js
 	npm i react-cookie
+	npm i --save react-spinners
+	npm i react-loading-overlay-ts@1.0.5
+	npm i --save react date-fns
+	npm i --save react-date-range
+	npm i react-error-boundary
+	
+Kendo
+	npm install --save @progress/kendo-react-editor @progress/kendo-react-intl @progress/kendo-react-buttons @progress/kendo-react-dropdowns @progress/kendo-react-dialogs @progress/kendo-react-inputs @progress/kendo-react-layout @progress/kendo-react-popup @progress/kendo-react-pdf @progress/kendo-react-progressbars @progress/kendo-drawing @progress/kendo-licensing @progress/kendo-svg-icons
+	npm install --save @progress/kendo-theme-default
+	import '@progress/kendo-theme-default/dist/all.css';
+		add into app.js file
+	npm i @progress/kendo-data-query
+	npm i @progress/kendo-react-grid
+	npm i --save @progress/kendo-licensing
+ag grid
+	npm i --save ag-grid-community ag-grid-react
+How to activate
+	npm install --save @progress/kendo-licensing
+	npx kendo-ui-license activate
 	
 Create a directory
 	mkdir components 
@@ -44,27 +63,5 @@ Java script expersion
 	protected route
 	
 	
-	import axios from "axios";
 
-export default axios.create({ 
-  // baseURL: "http://localhost:58031/api/",
-});
-
-
-import api from "./api";
-
-export function getRequest(URL, headers = null) {
-  return api.get(`/${URL}`, { headers }).then((response) => response);
-}
-
-export function postRequest(URL, payload, headers = null) {
-  return api.post(`/${URL}`, payload, { headers }).then((response) => response);
-}
-
-export function patchRequest(URL, payload) {
-  return api.patch(`/${URL}`, payload).then((response) => response);
-}
-
-export function deleteRequest(URL) {
-  return api.delete(`/${URL}`).then((response) => response);
-}
+  const [objBrand, setobjBrand] = useState<Brand | {}>({} as);

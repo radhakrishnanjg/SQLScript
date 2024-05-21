@@ -9,6 +9,21 @@ States
 	UseReducer
 	Context API
 	 
+Need to understand
+	Context API
+	Layout 
+	Spinner 
+	Protected Routes
+	Redux
+	Notification or toaster message one page to another page.
+	How to prevent home page into login on browser back button
+	Interceptor for token and other stuffs like spinner,or something
+	Error Boundary for services file and components
+	multiple Interceptor for error handling, session expired with request and response level
+	
+
+UseRef
+	
 useParams	
 	The useParams hook returns an object of key/value pairs of the dynamic params from the current URL 
 	that were matched by the <Route path>
