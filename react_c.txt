@@ -65,3 +65,12 @@ Java script expersion
 	
 
   const [objBrand, setobjBrand] = useState<Brand | {}>({} as);
+  
+  const isSelectedAll =
+    items.filter((a) => a.selected === true).length === items.length;
+	
+	<input
+            type="checkbox"
+            checked={isSelectedAll}
+            onChange={(e) => selectAll(e.target.checked)}
+          />
