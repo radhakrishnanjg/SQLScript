@@ -66,37 +66,11 @@ Java script expersion
 
   const [objBrand, setobjBrand] = useState<Brand | {}>({} as);
   
-  const isSelectedAll =
-    items.filter((a) => a.selected === true).length === items.length;
-	
-	<input
-            type="checkbox"
-            checked={isSelectedAll}
-            onChange={(e) => selectAll(e.target.checked)}
-          />
-		  function addItem(item) {
-    setItems((items) => [...items, item]);
-  }
-
-  function deleteItem(id) {
-    setItems((items) => {
-      return items.filter((item) => item.id !== id);
-    });
-  }
-
-  function onItemSelected(id) {
-    setItems((items) => {
-      return items.map((item) => {
-        return item.id === id ? { ...item, selected: !item.selected } : item;
-      });
-    });
-  }
-  function onSelectAll(e) {
-    console.log(e);
-    setItems((items) => {
-      return items.map((item) => {
-        return { ...item, selected: e };
-      });
-    });
-    setselectAll(e);
-  }
+  
+  https://www.youtube.com/watch?v=98JVaTcoexc&list=PLsZlhayVgqNwHNHeqpCkSgdRV08xrKtzW&index=6
+  
+  
+  https://github.com/ag-grid/react-data-grid/tree/main/getting-started-video-tutorial
+  
+  
+  
