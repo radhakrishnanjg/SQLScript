@@ -27,6 +27,8 @@ Required Npms
 	npm i --save react-date-range
 	npm i react-error-boundary
 	
+	npm i json-server && npm i lodash
+	
 Kendo
 	npm install --save @progress/kendo-react-editor @progress/kendo-react-intl @progress/kendo-react-buttons @progress/kendo-react-dropdowns @progress/kendo-react-dialogs @progress/kendo-react-inputs @progress/kendo-react-layout @progress/kendo-react-popup @progress/kendo-react-pdf @progress/kendo-react-progressbars @progress/kendo-drawing @progress/kendo-licensing @progress/kendo-svg-icons
 	npm install --save @progress/kendo-theme-default
@@ -37,6 +39,8 @@ Kendo
 	npm i --save @progress/kendo-licensing
 ag grid
 	npm i --save ag-grid-community ag-grid-react
+	
+	
 How to activate
 	npm install --save @progress/kendo-licensing
 	npx kendo-ui-license activate
@@ -74,3 +78,62 @@ Java script expersion
   
   
   https://github.com/vikas62081/agGrid/blob/quickFilter/src/App.js
+  
+  
+  import React, { useState } from 'react';
+import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+
+
+export default function SampleList() {
+    const ItemType = 'ITEM';
+
+    const initialItems = [
+        { id: '1', content: 'Item 1' },
+        { id: '2', content: 'Item 2' },
+        { id: '3', content: 'Item 3' },
+        { id: '4', content: 'Item 4' },
+    ];
+
+
+    const DraggableItem = ({ item, index, moveItem }) => {
+        const [, ref] = useDrag({
+            type: ItemType,
+            item: { index },
+        });
+
+        const [, drop] = useDrop({
+            accept: ItemType,
+            hover: (draggedItem) => {
+                if (draggedItem.index !== index) {
+                    moveItem(draggedItem.index, index);
+                    draggedItem.index = index;
+                }
+            },
+        });
+
+        return (
+            <li ref={(node) => ref(drop(node))} style={{ padding: '16px', border: '1px solid #ddd', marginBottom: '8px', backgroundColor: '#f4f4f4' }}>
+                {item.content}
+            </li>
+        );
+    };
+
+    const [items, setItems] = useState(initialItems);
+
+    const moveItem = (fromIndex, toIndex) => {
+        const updatedItems = [...items];
+        const [movedItem] = updatedItems.splice(fromIndex, 1);
+        updatedItems.splice(toIndex, 0, movedItem);
+        setItems(updatedItems);
+    };
+    return (
+        <DndProvider backend={HTML5Backend}>
+            <ul style={{ listStyleType: 'none', padding: 0 }}>
+                {items.map((item, index) => (
+                    <DraggableItem key={item.id} index={index} item={item} moveItem={moveItem} />
+                ))}
+            </ul>
+        </DndProvider>
+    )
+}
