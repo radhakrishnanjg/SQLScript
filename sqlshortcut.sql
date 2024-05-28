@@ -845,3 +845,81 @@ WITH (
 
 
 select * from RKGST.GSTINDetail
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Output clause example with nestd level 3 json
+	insert into  Amazon.InvoiceHeader(CompanyId,FileType,InvoiceFileID,InvoiceDate,InvoiceNumber,GSTTaxRegistrationNo,GSTIN,Total,LastModifiedBy,LastModifiedDate  
+	,CurrentStatusoftheCBE,CBE_XIIINumber,AirportOfArrival,FirstPortOfArrival,AssessableValue,DutyRs,InvoiceValue,KYCID,StateCode,InterestAmount,TotalAmount)  
+	SELECT @CompanyId,@FileType,@InvoiceFileID,@InvoiceDate ,@InvoiceNumber, null,null,null,@LoginId,getdate()   
+	,@CurrentStatusoftheCBE,@CBE_XIIINumber,@AirportOfArrival,@FirstPortOfArrival,@AssessableValue,@DutyRs,@InvoiceValue,@KYCID,@StateCode,@InterestAmount,@DutyRs  
+
+	set @InvoiceHeaderID=SCOPE_IDENTITY()   
+
+	declare @insertedBOEheader as table (InvoiceCourierBillOEntryDetailID bigint not null,RowIndex bigint null,lstInvoiceCourierBillOEntryDutySDetail nvarchar(max))   
+
+	insert into Amazon.InvoiceCourierBillOEntryDetail ( CompanyId,InvoiceHeaderID,RowIndex,CTSH  
+	,DescriptionofGoods,Quantity,InvoiceNumber,InvoiceValue  
+	,UnitPrice,RateofExchange,AssessableValue,DutyRS  
+	,LastModifiedBy,LastModifiedDate  
+	,lstInvoiceCourierBillOEntryDutySDetail)   
+	OUTPUT INSERTED.InvoiceCourierBillOEntryDetailID,INSERTED.RowIndex,INSERTED.lstInvoiceCourierBillOEntryDutySDetail into @insertedBOEheader  
+	SELECT distinct @CompanyId,@InvoiceHeaderID,RowIndex,CTSH  
+	,DescriptionofGoods,Quantity,InvoiceNumber,InvoiceValue  
+	,UnitPrice,RateofExchange,AssessableValue,DutyRS  
+	,@LoginId,getdate()  
+	,lstInvoiceCourierBillOEntryDutySDetail  
+	FROM  
+	OPENJSON ( @lstInvoiceCourierBillOEntryDetail )    
+	WITH (        
+		RowIndex								int     '$.RowIndex' ,  
+		CTSH									varchar(100)  '$.CTSH' ,  
+		DescriptionofGoods						varchar(500) '$.DescriptionofGoods'  ,  
+		Quantity								varchar(100) '$.Quantity'  ,  
+		InvoiceNumber							varchar(100) '$.InvoiceNumber'  ,  
+		InvoiceValue							varchar(100) '$.InvoiceValue'   ,  
+
+		UnitPrice								varchar(30) '$.UnitPrice'   ,  
+		RateofExchange							varchar(30) '$.RateofExchange'   ,  
+		AssessableValue							varchar(30) '$.AssessableValue'   ,  
+		DutyRS									varchar(30) '$.DutyRS'  ,   
+		lstInvoiceCourierBillOEntryDutySDetail	nvarchar(max) AS JSON  
+
+	)  
+	order by rowindex   
+
+	--select * from @insertedBOEheader  
+
+	select @c=count(RowIndex) FROM @insertedBOEheader  
+	set @i=1  
+	while (@i<=@c)  
+	begin   
+
+		declare @lstInvoiceCourierBillOEntryDutySDetail nvarchar(max)  
+		declare @InvoiceCourierBillOEntryDetailID bigint    
+
+		SELECT  @InvoiceCourierBillOEntryDetailID=InvoiceCourierBillOEntryDetailID  
+		,@lstInvoiceCourierBillOEntryDutySDetail=lstInvoiceCourierBillOEntryDutySDetail    
+		FROM @insertedBOEheader where RowIndex=@i   
+
+
+		insert into Amazon.InvoiceCourierBillOEntryDutySDetail ( CompanyId,InvoiceHeaderID  
+		,InvoiceCourierBillOEntryDetailID,SrNo,DutyHead,AdValorem,SpecificRate,DutyForgon,DutyAmount  
+		,LastModifiedBy,LastModifiedDate)   
+		SELECT distinct @CompanyId,@InvoiceHeaderID  
+		,@InvoiceCourierBillOEntryDetailID,SrNo,DutyHead,AdValorem,SpecificRate,DutyForgon,DutyAmount  
+		,@LoginId,getdate()  
+		FROM  
+		OPENJSON ( @lstInvoiceCourierBillOEntryDutySDetail )    
+		WITH (        
+			RowIndex		int     '$.RowIndex' ,  
+			SrNo			varchar(30)   '$.SrNo' ,  
+			DutyHead		varchar(100)  '$.DutyHead' ,  
+			AdValorem		varchar(500)  '$.AdValorem'  ,  
+			SpecificRate	varchar(30)   '$.SpecificRate'  ,  
+			DutyForgon		varchar(30)   '$.DutyForgon'  ,  
+			DutyAmount		varchar(30)   '$.DutyAmount'      
+		)    
+
+
+		set @i=@i+1   
+	end  
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
