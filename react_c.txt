@@ -138,69 +138,61 @@ export default function SampleList() {
     )
 }
 
+const TabPanel = () => {
+  const [activeTab, setActiveTab] = useState('tab1');
 
-// WindowsLoginContext.js
-import React, { createContext, useState, useEffect } from 'react';
-
-const WindowsLoginContext = createContext(null);
-
-const WindowsLoginProvider = ({ children }) => {
-  const [windowsLogin, setWindowsLogin] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchWindowsLogin = async () => {
-      try {
-        const response = await fetch('/api/windows-login');
-        const data = await response.json();
-        setWindowsLogin(data);
-      } catch (error) {
-        console.error('Failed to fetch Windows login:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchWindowsLogin();
-  }, []);
-
-  if (loading) {
-    return <div>Loading...</div>; // Show a loading spinner or message
-  }
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+  };
 
   return (
-    <WindowsLoginContext.Provider value={windowsLogin}>
-      {children}
-    </WindowsLoginContext.Provider>
-  );
-};
-
-export { WindowsLoginContext, WindowsLoginProvider };
------------------------------------
-const App = () => {
-  return (
-    <WindowsLoginProvider>
-      <MainApp />
-    </WindowsLoginProvider>
-  );
-};
-
-export default App;
-
---------------------------------------
-const MainApp = () => {
-  const windowsLogin = useContext(WindowsLoginContext);
-
-  if (!windowsLogin) {
-    return <div>No user information available</div>;
-  }
-
-  return (
-    <div>
-      <h1>Welcome, {windowsLogin.username}</h1>
-      {/* Your main app content */}
+    <div className="container mt-5">
+      <ul className="nav nav-tabs">
+        <li className="nav-item">
+          <button
+            className={`nav-link ${activeTab === 'tab1' ? 'active' : ''}`}
+            onClick={() => handleTabClick('tab1')}
+          >
+            Tab 1
+          </button>
+        </li>
+        <li className="nav-item">
+          <button
+            className={`nav-link ${activeTab === 'tab2' ? 'active' : ''}`}
+            onClick={() => handleTabClick('tab2')}
+          >
+            Tab 2
+          </button>
+        </li>
+        <li className="nav-item">
+          <button
+            className={`nav-link ${activeTab === 'tab3' ? 'active' : ''}`}
+            onClick={() => handleTabClick('tab3')}
+          >
+            Tab 3
+          </button>
+        </li>
+      </ul>
+      <div className="tab-content mt-3">
+        {activeTab === 'tab1' && (
+          <div className="tab-pane fade show active">
+            <h4>Tab 1</h4>
+            <p>This is the description for Tab 1.</p>
+          </div>
+        )}
+        {activeTab === 'tab2' && (
+          <div className="tab-pane fade show active">
+            <h4>Tab 2</h4>
+            <p>This is the description for Tab 2.</p>
+          </div>
+        )}
+        {activeTab === 'tab3' && (
+          <div className="tab-pane fade show active">
+            <h4>Tab 3</h4>
+            <p>This is the description for Tab 3.</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
-
-export default MainApp;
