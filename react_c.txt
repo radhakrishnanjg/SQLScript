@@ -139,23 +139,68 @@ export default function SampleList() {
 }
 
 
-import { createContext, useContext } from 'react';
-import { IUser } from '../services/model';
+// WindowsLoginContext.js
+import React, { createContext, useState, useEffect } from 'react';
 
+const WindowsLoginContext = createContext(null);
 
-export const UserContext = createContext<IUser | undefined>(undefined);
+const WindowsLoginProvider = ({ children }) => {
+  const [windowsLogin, setWindowsLogin] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-export function useUserContext() {
-  const user = useContext(UserContext);
+  useEffect(() => {
+    const fetchWindowsLogin = async () => {
+      try {
+        const response = await fetch('/api/windows-login');
+        const data = await response.json();
+        setWindowsLogin(data);
+      } catch (error) {
+        console.error('Failed to fetch Windows login:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  if (user === undefined) {
-    throw new Error('useUserContext must be used with a UserContext');
+    fetchWindowsLogin();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>; // Show a loading spinner or message
   }
 
-  return user;
-}
+  return (
+    <WindowsLoginContext.Provider value={windowsLogin}>
+      {children}
+    </WindowsLoginContext.Provider>
+  );
+};
 
- const user = useUserContext();
-  const user = sadsad
-  <UserContext.Provider value={user}>
- </UserContext.Provider >
+export { WindowsLoginContext, WindowsLoginProvider };
+-----------------------------------
+const App = () => {
+  return (
+    <WindowsLoginProvider>
+      <MainApp />
+    </WindowsLoginProvider>
+  );
+};
+
+export default App;
+
+--------------------------------------
+const MainApp = () => {
+  const windowsLogin = useContext(WindowsLoginContext);
+
+  if (!windowsLogin) {
+    return <div>No user information available</div>;
+  }
+
+  return (
+    <div>
+      <h1>Welcome, {windowsLogin.username}</h1>
+      {/* Your main app content */}
+    </div>
+  );
+};
+
+export default MainApp;
