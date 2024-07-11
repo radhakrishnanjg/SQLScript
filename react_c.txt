@@ -79,120 +79,68 @@ Java script expersion
   
   https://github.com/vikas62081/agGrid/blob/quickFilter/src/App.js
   
-  
-  import React, { useState } from 'react';
-import { DndProvider, useDrag, useDrop } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
+  import { Injectable } from '@angular/core';
+import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { AuthenticationService } from '../_services/service/authentication.service';
+@Injectable()
+export class JwtInterceptor implements HttpInterceptor {
+    constructor(private authenticationService: AuthenticationService) { }
 
-
-export default function SampleList() {
-    const ItemType = 'ITEM';
-
-    const initialItems = [
-        { id: '1', content: 'Item 1' },
-        { id: '2', content: 'Item 2' },
-        { id: '3', content: 'Item 3' },
-        { id: '4', content: 'Item 4' },
-    ];
-
-
-    const DraggableItem = ({ item, index, moveItem }) => {
-        const [, ref] = useDrag({
-            type: ItemType,
-            item: { index },
-        });
-
-        const [, drop] = useDrop({
-            accept: ItemType,
-            hover: (draggedItem) => {
-                if (draggedItem.index !== index) {
-                    moveItem(draggedItem.index, index);
-                    draggedItem.index = index;
+    intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+        // add authorization header with jwt token if available
+        let currentUser = this.authenticationService.currentUserValue;
+        if (currentUser && currentUser.AuthToken) {
+            request = request.clone({
+                setHeaders: {
+                    UserId: `${currentUser.UserId}`,
+                    Token: `${currentUser.AuthToken}`,
+                    'Accept': 'application/json;charset=utf-8'
                 }
-            },
-        });
+            });
+        }
 
-        return (
-            <li ref={(node) => ref(drop(node))} style={{ padding: '16px', border: '1px solid #ddd', marginBottom: '8px', backgroundColor: '#f4f4f4' }}>
-                {item.content}
-            </li>
-        );
-    };
-
-    const [items, setItems] = useState(initialItems);
-
-    const moveItem = (fromIndex, toIndex) => {
-        const updatedItems = [...items];
-        const [movedItem] = updatedItems.splice(fromIndex, 1);
-        updatedItems.splice(toIndex, 0, movedItem);
-        setItems(updatedItems);
-    };
-    return (
-        <DndProvider backend={HTML5Backend}>
-            <ul style={{ listStyleType: 'none', padding: 0 }}>
-                {items.map((item, index) => (
-                    <DraggableItem key={item.id} index={index} item={item} moveItem={moveItem} />
-                ))}
-            </ul>
-        </DndProvider>
-    )
+        return next.handle(request);
+    }
 }
 
-const TabPanel = () => {
-  const [activeTab, setActiveTab] = useState('tab1');
+import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { retry, catchError } from 'rxjs/operators';
+import { Injectable } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { RkmodalComponent } from '../layout1/rkmodal/rkmodal.component';
+import { Router } from '@angular/router';
+@Injectable()
+export class HttpErrorInterceptor implements HttpInterceptor {
+    constructor(
+        private modalService: NgbModal,
+        private router: Router,) { }
 
-  const handleTabClick = (tab) => {
-    setActiveTab(tab);
-  };
+    intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+        return next.handle(request).pipe(
+            //retry(1),//
+            catchError(err => {
+                //Session error  
+                if (this.router.url !== '/SI_PcExpGZbbArkBCN3mishikaUbkSIS4GFa3BFOg' && err.status === 401) {
+                    this.modalService.dismissAll();
+                    const modalRef = this.modalService.open(RkmodalComponent);
+                    modalRef.componentInstance.my_modal_title = 'Your session expired.!';
+                    modalRef.componentInstance.my_modal_content = 'Any confirmed transaction are saved.but you will need to restart any searches ' +
+                        'or unfinished transactions.';
+                }
+                //bad reqest error
+                else if (err.status === 400) {
+                    const modalRef = this.modalService.open(RkmodalComponent);
+                    modalRef.componentInstance.my_modal_title = 'Information!';
+                    modalRef.componentInstance.my_modal_content = `Something went wrong.  Please try again after somettimes.! ` +
+                        `\n Error Code: ${err.status} \r\n Message: ${err.message}`;
+                }
+                const error = err.error || err.statusText;
+                return throwError(error);
+            }))
+    }
+}
 
-  return (
-    <div className="container mt-5">
-      <ul className="nav nav-tabs">
-        <li className="nav-item">
-          <button
-            className={`nav-link ${activeTab === 'tab1' ? 'active' : ''}`}
-            onClick={() => handleTabClick('tab1')}
-          >
-            Tab 1
-          </button>
-        </li>
-        <li className="nav-item">
-          <button
-            className={`nav-link ${activeTab === 'tab2' ? 'active' : ''}`}
-            onClick={() => handleTabClick('tab2')}
-          >
-            Tab 2
-          </button>
-        </li>
-        <li className="nav-item">
-          <button
-            className={`nav-link ${activeTab === 'tab3' ? 'active' : ''}`}
-            onClick={() => handleTabClick('tab3')}
-          >
-            Tab 3
-          </button>
-        </li>
-      </ul>
-      <div className="tab-content mt-3">
-        {activeTab === 'tab1' && (
-          <div className="tab-pane fade show active">
-            <h4>Tab 1</h4>
-            <p>This is the description for Tab 1.</p>
-          </div>
-        )}
-        {activeTab === 'tab2' && (
-          <div className="tab-pane fade show active">
-            <h4>Tab 2</h4>
-            <p>This is the description for Tab 2.</p>
-          </div>
-        )}
-        {activeTab === 'tab3' && (
-          <div className="tab-pane fade show active">
-            <h4>Tab 3</h4>
-            <p>This is the description for Tab 3.</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: HttpErrorInterceptor, multi: true },
