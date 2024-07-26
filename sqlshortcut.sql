@@ -923,3 +923,75 @@ select * from RKGST.GSTINDetail
 		set @i=@i+1   
 	end  
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Cross Apply and Outer apply
+	-- CROSS APPLY:
+		-- Inner Join Behavior: It acts like an inner join between a table and a table-valued function. 
+	-- OUTER APPLY:
+		-- Left Join Behavior: It acts like a left join between a table and a table-valued function.
+	Declare @Json varchar(max)
+	set @json ='{
+	    "lstSTNDetail": [ 
+	        {
+	            "SNO": "7",
+	            "DESCRIPTIONOFGOODS": "Comfyable Puffy Laptop Sl..., 13 in 14 in Cover, Pink",
+	            "FNSKU": "X001YYUHW5",
+	            "ASIN": "B0BWRQRXKS",
+	            "MRP": "4999",
+	            "QTY": "8",
+	            "BOXNO": "5",
+	            "WEIGHTQTY": "16.1",
+	            "MERCHANTSKU": "LS-LJJ-80-13-A-1"
+	        },
+	        {
+	            "SNO": "8",
+	            "DESCRIPTIONOFGOODS": "Comfyable Puffy Laptop Sl... 14 Inch, Neutral, Orange",
+	            "FNSKU": "X001YYQGGB",
+	            "ASIN": "B0BHW3MP7J",
+	            "MRP": "4999",
+	            "QTY": "8",
+	            "BOXNO": "5",
+	            "WEIGHTQTY": "16.1",
+	            "MERCHANTSKU": "LS-LJJ-62-13-A-1"
+	        }
+	    ],
+	    "SHIPFROM": "V28063779",
+	    "SHIPTO":"2",
+	    "GSTIN": "29AAFCV5265N1ZK",
+	    "APPOINTMENTID": "",
+	    "SHIPMENTID": "FBA15HW9S335",
+	    "TIMEDATE": "15-03-2024 00:00:00"
+	}'
+        INSERT INTO Amazon.STNHeader (CompanyId,InvoiceHeaderID,CreatedBy,CreatedDate
+	,SHIPFROM, SHIPTO, GSTIN, APPOINTMENTID, SHIPMENTID, TIMEDATE)
+	SELECT  @CompanyId CompanyId, @InvoiceHeaderID InvoiceHeaderID,@LoginId CreatedBy,getdate() CreatedDate  
+	,SHIPFROM, SHIPTO, GSTIN, APPOINTMENTID, SHIPMENTID, TIMEDATE
+	FROM OPENJSON(@json)
+	WITH (
+		SHIPFROM		VARCHAR(500) '$.SHIPFROM',
+		SHIPTO			VARCHAR(500) '$.SHIPTO',
+		GSTIN			VARCHAR(500) '$.GSTIN',
+		APPOINTMENTID	VARCHAR(500) '$.APPOINTMENTID',
+		SHIPMENTID		VARCHAR(500) '$.SHIPMENTID',
+		TIMEDATE		VARCHAR(500) '$.TIMEDATE' 
+	);
+
+	declare @STNHeaderId bigint
+	set @STNHeaderId=SCOPE_IDENTITY() 
+
+	INSERT INTO Amazon.STNDetail (STNHeaderId,CompanyId
+	,SNO, DESCRIPTIONOFGOODS, FNSKU, ASIN, MRP, QTY, BOXNO, WEIGHTQTY, MERCHANTSKU)
+	SELECT distinct @STNHeaderId STNHeaderId,@CompanyId CompanyId
+	,SNO, DESCRIPTIONOFGOODS, FNSKU, ASIN, MRP, QTY, BOXNO, WEIGHTQTY, MERCHANTSKU
+	FROM OPENJSON(@json)
+	OUTER APPLY OPENJSON(@json, '$.lstSTNDetail') 
+	WITH (
+		SNO					VARCHAR(10) '$.SNO',
+		DESCRIPTIONOFGOODS	VARCHAR(500) '$.DESCRIPTIONOFGOODS',
+		FNSKU				VARCHAR(500) '$.FNSKU',
+		ASIN				VARCHAR(500) '$.ASIN',
+		MRP					VARCHAR(500) '$.MRP',
+		QTY					VARCHAR(500) '$.QTY',
+		BOXNO				VARCHAR(500) '$.BOXNO',
+		WEIGHTQTY			VARCHAR(500) '$.WEIGHTQTY',
+		MERCHANTSKU			VARCHAR(500) '$.MERCHANTSKU'
+	);
