@@ -847,6 +847,8 @@ WITH (
 select * from RKGST.GSTINDetail
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Output clause example with nestd level 3 json
+	-- https://www.sqlservercentral.com/articles/the-output-clause-for-the-merge-statements
+	
 	insert into  Amazon.InvoiceHeader(CompanyId,FileType,InvoiceFileID,InvoiceDate,InvoiceNumber,GSTTaxRegistrationNo,GSTIN,Total,LastModifiedBy,LastModifiedDate  
 	,CurrentStatusoftheCBE,CBE_XIIINumber,AirportOfArrival,FirstPortOfArrival,AssessableValue,DutyRs,InvoiceValue,KYCID,StateCode,InterestAmount,TotalAmount)  
 	SELECT @CompanyId,@FileType,@InvoiceFileID,@InvoiceDate ,@InvoiceNumber, null,null,null,@LoginId,getdate()   
