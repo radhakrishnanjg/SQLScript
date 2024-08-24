@@ -997,3 +997,11 @@ select * from RKGST.GSTINDetail
 		WEIGHTQTY			VARCHAR(500) '$.WEIGHTQTY',
 		MERCHANTSKU			VARCHAR(500) '$.MERCHANTSKU'
 	);
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- How to get all jobs names from sql server instance 
+
+	SELECT job_id,sj.name AS jobName  
+	,date_created,	date_modified 
+	FROM msdb.dbo.sysjobs sj 
+	WHERE 1 =1
+	and (sj.name LIKE 'citi%')    
