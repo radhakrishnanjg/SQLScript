@@ -294,8 +294,7 @@ SET @incre=1
 SET @TotalCount= (select count(1) from api.MWSConfiguration_SPAPI)
 
 WHILE ( @incre <= @TotalCount)
-BEGIN
-    PRINT 'The counter value is = ' + CONVERT(VARCHAR,@Counter)
+BEGIN 
 	-- do your action
 
     SET @incre = @incre  + 1
