@@ -78,9 +78,3 @@ Java script expersion
   
   
   https://github.com/vikas62081/agGrid/blob/quickFilter/src/App.js
-paternity leave
-I am writing to request paternity leave following the upcoming arrival of my child. 
-My partner is expecting a baby on 17th November and i would like to take 3 weeks (Paternity Leave :5,  Annual Leave :7, Comp off :3) of leave to support them and care for our new family member.
-I would like to start my leave on 11th November and return to work on 2nd December , 2024
-
-Thank you in advance for considering my request.
