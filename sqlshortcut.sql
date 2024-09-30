@@ -453,6 +453,30 @@ where 1=1
 --having count(*)>1
 ) 
 select * from CTE where R = 1
+ 
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Simple JSON insert
+set @json=concat('[' ,@json , ']')   
+declare @Remarks  varchar(500)
+declare @lstDebitNoteDetail  varchar(max)  
+
+SET @Remarks=JSON_VALUE(@json,'$[0].Remarks');  
+SET @lstDebitNoteDetail=JSON_query(@json,'$[0].lstDebitNoteDetail'); 
+
+SELECT distinct @DNID,@CompanyDetailID,ItemID,0, TotalAmount,
+PendingTotalAmount-TotalAmount,(PendingTotalAmount-TotalAmount)/IIF(PendingQty=0,1,PendingQty),Reason, @LoginId,getdate()  FROM
+OPENJSON ( @lstDebitNoteDetail )  
+WITH (      
+	ItemID   BIGINT  '$.ItemID' ,
+	Qty INT '$.Qty' ,  
+	InvoiceQty INT '$.InvoiceQty' ,  
+	PendingQty INT '$.PendingQty' ,  
+	TotalAmount decimal(18,2) '$.TotalAmount' ,
+	InvoiceTotalAmount decimal(18,2) '$.InvoiceTotalAmount' ,
+	PendingTotalAmount decimal(18,2) '$.PendingTotalAmount' ,
+	Reason varchar(200) '$.Reason' 
+) 
+	
 -------------------------------------------------------------------------------------------------------------------------------------------------------
 -- JSON to table Query
 IF OBJECT_ID(N'sp_jsont', N'P') IS NOT NULL
