@@ -62,17 +62,4 @@ useMemo
 useTransition
 
 useDeferredValue
-
-
-Success & Achievements
-I resolved several production issues related to Group 1, 2, and 3 data migration, ensuring smoother operations and data integrity.
-Successfully completed the COBAM FX callback workflow, including its functionalities, which are now fully operational. I am also currently working on SPI 1A FX callback Jira tasks.
-Addressed and completed two critical CID reporting jobs, which have significantly enhanced the stability and resiliency of our BAU (Business As Usual) applications.
-Actively participated in all SPI and BAU application production releases, contributing to the successful deployment and monitoring of these systems.
-My current focus is on the SPI FX callback workflow, ensuring seamless integration and functionality across systems.
-Areas of Focus
-I have learned React front-end technology and successfully implemented 2-3 screens in the SPI application, contributing to the development of the user interface.
-I am continuing to improve my understanding of JSON schema and MS SQL JSON integration while also learning the WF React framework to further enhance my skills in building React applications.
-Overall Comments
-This year has been a productive period of growth in both back-end and front-end development. I’ve contributed to critical projects, enhanced my technical skill set, and actively participated in production releases. I look forward to further advancing my expertise in React, JSON, and workflow automation while continuing to support and improve our applications.
  
