@@ -64,118 +64,15 @@ useTransition
 useDeferredValue
 
 
-To prepare content on **JSON Schema in .NET Core applications**, here’s a structured outline you can follow, along with key points for each section:
-
-### 1. **Introduction to JSON Schema**
-   - **Definition**: JSON Schema is a specification for defining the structure and validation constraints of JSON documents. It helps ensure that the data is structured correctly.
-   - **Use Cases**:
-     - Validating JSON data structure.
-     - Defining API contracts (request and response).
-     - Generating documentation for APIs.
-   - **Example**:
-     ```json
-     {
-       "$schema": "http://json-schema.org/draft-07/schema#",
-       "type": "object",
-       "properties": {
-         "name": {
-           "type": "string"
-         },
-         "age": {
-           "type": "integer"
-         }
-       },
-       "required": ["name"]
-     }
-     ```
-
-### 2. **JSON Schema in .NET Core**
-   - **Libraries for JSON Schema Validation**:
-     - **Newtonsoft.Json.Schema**: A popular library for .NET that supports JSON schema validation.
-     - **System.Text.Json** (doesn’t natively support schema but can be extended with validation logic).
-   - **Integrating with .NET Core**:
-     - Adding the `Newtonsoft.Json.Schema` NuGet package:
-       ```bash
-       Install-Package Newtonsoft.Json.Schema
-       ```
-
-### 3. **Basic Validation Example**
-   - **Loading and Validating JSON Against a Schema**:
-     ```csharp
-     using Newtonsoft.Json.Schema;
-     using Newtonsoft.Json.Linq;
-
-     string jsonData = @"{
-       'name': 'John',
-       'age': 30
-     }";
-     
-     string jsonSchema = @"{
-       'type': 'object',
-       'properties': {
-         'name': {'type': 'string'},
-         'age': {'type': 'integer'}
-       },
-       'required': ['name', 'age']
-     }";
-     
-     JSchema schema = JSchema.Parse(jsonSchema);
-     JObject json = JObject.Parse(jsonData);
-     
-     bool isValid = json.IsValid(schema, out IList<string> errors);
-     
-     if (isValid)
-     {
-       Console.WriteLine("Valid JSON!");
-     }
-     else
-     {
-       Console.WriteLine("Invalid JSON!");
-       foreach (var error in errors)
-       {
-         Console.WriteLine(error);
-       }
-     }
-     ```
-
-### 4. **Handling Validation Errors**
-   - **Error Handling**: Capture and display error details when JSON fails validation.
-   - **Use Cases**: Preventing bad data from being persisted or processed, ensuring integrity across microservices, and validating API payloads.
-
-### 5. **Advanced Features of JSON Schema**
-   - **Combining Schemas**: Use `allOf`, `oneOf`, `anyOf` to combine schemas.
-   - **Array Validation**: Enforce rules on arrays (e.g., min/max items, item types).
-   - **Pattern Matching**: Use regular expressions in schemas to validate string patterns.
-   - **Custom Formats**: Extend JSON schema with custom formats (e.g., for validating email, URLs).
-
-### 6. **Generating JSON Schemas in .NET Core**
-   - **From C# Classes**: Automatically generate JSON schema from C# classes using tools like `NJsonSchema` or `Json.NET Schema`.
-   - **Example**:
-     ```csharp
-     using NJsonSchema;
-
-     var schema = JsonSchema.FromType<MyClass>();
-     Console.WriteLine(schema.ToJson());
-     ```
-
-### 7. **Versioning and Compatibility**
-   - **Schema Draft Versions**: Ensure that your schema is compliant with the correct draft (e.g., draft-07, draft-2019-09).
-   - **Backward Compatibility**: Discuss best practices for managing schema updates and maintaining backward compatibility.
-
-### 8. **Best Practices**
-   - **Keep Schemas Modular**: Break down large schemas into reusable components.
-   - **Document the Schema**: Add descriptive titles and comments within the schema for clarity.
-   - **Schema Reusability**: Reference schemas within other schemas to reduce duplication.
-
-### 9. **Performance Considerations**
-   - **Schema Caching**: Cache schemas if they are used repeatedly in the application.
-   - **Batch Validation**: Validate multiple JSON objects in a batch to improve performance when dealing with large datasets.
-
-### 10. **Conclusion**
-   - **JSON Schema’s Role in API Development**: It simplifies the validation process and ensures that the contract between different components is followed.
-   - **Integration with Modern Web Frameworks**: JSON Schema is a valuable tool for microservices, APIs, and web applications where JSON is the primary data exchange format.
-
----
-
-This content should give a comprehensive overview of JSON Schema usage in .NET Core applications. You can modify it according to your audience’s expertise level and add code samples or explanations where necessary.
+Success & Achievements
+I resolved several production issues related to Group 1, 2, and 3 data migration, ensuring smoother operations and data integrity.
+Successfully completed the COBAM FX callback workflow, including its functionalities, which are now fully operational. I am also currently working on SPI 1A FX callback Jira tasks.
+Addressed and completed two critical CID reporting jobs, which have significantly enhanced the stability and resiliency of our BAU (Business As Usual) applications.
+Actively participated in all SPI and BAU application production releases, contributing to the successful deployment and monitoring of these systems.
+My current focus is on the SPI FX callback workflow, ensuring seamless integration and functionality across systems.
+Areas of Focus
+I have learned React front-end technology and successfully implemented 2-3 screens in the SPI application, contributing to the development of the user interface.
+I am continuing to improve my understanding of JSON schema and MS SQL JSON integration while also learning the WF React framework to further enhance my skills in building React applications.
+Overall Comments
+This year has been a productive period of growth in both back-end and front-end development. I’ve contributed to critical projects, enhanced my technical skill set, and actively participated in production releases. I look forward to further advancing my expertise in React, JSON, and workflow automation while continuing to support and improve our applications.
  
