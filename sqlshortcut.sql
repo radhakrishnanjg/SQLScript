@@ -106,7 +106,15 @@ IF NOT EXISTS(SELECT 1 FROM sys.key_constraints WHERE type = 'UQ'   and name='UK
 begin
 	alter table dbo.RoleMenu
 	add constraint UK_RoleMenu unique (RoleId,MenuId)  
-end
+end 
+--------------------------------------------------------------------------------------------------------------------------------------
+-- Checking  CHECK constraints
+IF EXISTS(SELECT 1 FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS as c  where TABLE_SCHEMA='Register' and table_Name = 'FilterConfig' and CONSTRAINT_NAME='CHK_FilterConfig_SearchType')
+begin
+	ALTER TABLE Register.FilterConfig 
+	ADD CONSTRAINT CHK_FilterConfig_SearchType CHECK ([SearchType] in ('TEXT','DATE','BOOLEAN'))
+end 
+go
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Find all store proc with schema using sp_s
 CREATE proc sp_s  
