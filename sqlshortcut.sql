@@ -95,7 +95,7 @@ begin
 end
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Checking Foreign Key 
-IF NOT EXISTS(SELECT 1 FROM sys.key_constraints WHERE type = 'FK'   and name='FK_RoleMenu')
+IF NOT EXISTS(SELECT * FROM sys.foreign_keys WHERE type = 'F' and name='FK_RoleMenu')
 begin
 	alter table dbo.RoleMenu
 	add constraint FK_RoleMenu Foreign key (RoleId) references Roles(RoleId)
