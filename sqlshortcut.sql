@@ -12,6 +12,34 @@ begin catch
 	end
 
 end catch
+-------------------------------------------------------------------------------------------------------------------------------------
+Example: Using GOTO with TRY and CATCH
+BEGIN TRY
+    -- Example: Simulate a divide by zero error
+    DECLARE @Result INT;
+    DECLARE @Value1 INT = 10;
+    DECLARE @Value2 INT = 0;
+
+    IF @Value2 = 0
+        GOTO HandleError; -- Jump to error handling section if @Value2 is zero
+
+    SET @Result = @Value1 / @Value2;
+    PRINT 'Result: ' + CAST(@Result AS NVARCHAR(50));
+
+    GOTO EndExecution; -- Skip error handling section if no error occurs
+
+HandleError:
+    PRINT 'An error occurred: Division by zero is not allowed.';
+    RETURN; -- Exit the execution
+
+END TRY
+BEGIN CATCH
+    -- Capture and handle errors
+    PRINT 'Error: ' + ERROR_MESSAGE();
+END CATCH
+
+EndExecution:
+PRINT 'Execution completed.'; 
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Store Proc Checking 
 IF OBJECT_ID(N'API.GetRefreshToken', N'P') IS NOT NULL
