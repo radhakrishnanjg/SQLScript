@@ -169,7 +169,7 @@ begin
 
 end
 ---------------------------------------------------------------------------------------------------------------------------------------
--- comma seperared values using Stuff example 
+-- comma separated values using Stuff example 
 	select distinct t1.id,
   STUFF(
          (SELECT ', ' + convert(varchar(10), t2.date, 120)
@@ -177,7 +177,11 @@ end
           where t1.id = t2.id
           FOR XML PATH (''))
           , 1, 1, '')  AS date
-from yourtable t1;
+from yourtable t1; 
+---------------------------------------------------------------------------------------------------------------------------------------
+-- comma separated values using STRING_AGG
+SELECT STRING_AGG(cast(Name as varchar(max)) , ', ') AS ConcatenatedNames
+FROM Employees;
 ---------------------------------------------------------------------------------------------------------------------------------------
 -- Error Log table
 insert into  Register.ErrorLog(CompanyDetailID,ScreenName,UniqueNumber,ErrorMessage,CreatedDate)
