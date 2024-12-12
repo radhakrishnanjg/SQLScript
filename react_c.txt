@@ -79,6 +79,9 @@ Java script expersion
   
   https://github.com/vikas62081/agGrid/blob/quickFilter/src/App.js
 
+launchSettings.json
+
+
 "iisSettings": {
   "windowsAuthentication": true,
   "anonymousAuthentication": false
