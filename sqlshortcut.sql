@@ -1,3 +1,18 @@
+Using IDENTITY() in a SELECT INTO Query
+-- Example 1 
+SELECT 
+    IDENTITY(INT, 1, 1) AS IdentityColumn,
+    SomeColumn,
+    AnotherColumn
+INTO NewTable
+FROM YourTable;
+-- Example 3 
+SELECT 
+    ROW_NUMBER() OVER (ORDER BY SomeColumn) AS IdentityColumn,
+    SomeColumn,
+    AnotherColumn
+FROM YourTable;
+-------------------------------------------------------------------------------------------------------------------------------------
 -- Try and Catch Block with transaction Syntax
 Begin Try 
 	Begin Tran   
