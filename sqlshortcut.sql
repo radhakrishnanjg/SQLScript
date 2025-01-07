@@ -1,3 +1,12 @@
+
+-------------------------------------------------------------------------------------------------------------------------------------
+-- COALESCE Example
+
+SELECT COALESCE(NULL, NULL, NULL, 'W3Schools.com', NULL, 'Example.com');
+
+select COALESCE(a.Firstname,a.lastname, '') Name from register.users as a
+
+-------------------------------------------------------------------------------------------------------------------------------------
 Using IDENTITY() in a SELECT INTO Query
 -- Example 1 
 SELECT 
