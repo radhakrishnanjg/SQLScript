@@ -168,6 +168,13 @@ begin
 end 
 go
 --------------------------------------------------------------------------------------------------------------------------------------
+IF EXISTS (SELECT * FROM sys.check_constraints WHERE name = 'chk_CatalogueDetail_CTH_HSN')
+begin
+	alter table Catalogue.CatalogueDetail   
+	add CONSTRAINT chk_CatalogueDetail_CTH_HSN check  (LEN(CTH_HSN) = 8 and isnull(CTH_HSN,'') !='' );
+end
+go 
+--------------------------------------------------------------------------------------------------------------------------------------
 -- Find all store proc with schema using sp_s
 CREATE proc sp_s  
 @tbl varchar(100)  
