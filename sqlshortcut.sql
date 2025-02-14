@@ -194,7 +194,7 @@ CREATE proc sp_t
 as  
 begin   
     
-	select   'select top 3  * from ' +  s.name + '.'+ t.name + ' order by 1 desc ' FROM sys.tables as t   
+	select   'select top 3  * from ' +  s.name + '.'+ t.name + ' with (nolock) where 1=1 order by 1 desc ' FROM sys.tables as t   
 	inner join sys.schemas s on s.schema_id=t.schema_id 
 	where   t.name like '%'+ @tbl +'%'   or s.name like '%'+ @tbl +'%' 
 
