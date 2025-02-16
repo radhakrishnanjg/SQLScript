@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <root>
+     <0>
+         <SellerFormID>3343</SellerFormID>
+         <CatalogueID>114475</CatalogueID>
+         <CatalogueNumber>XCN37567936</CatalogueNumber>
+         <CatalogueDate>2025-02-12T06:36:17.680</CatalogueDate>
+         <Seller_CatalogueStatus>Under Review</Seller_CatalogueStatus>
+         <Custom_CatalogueStatus>New</Custom_CatalogueStatus>
+         <IOR_CatalogueStatus>Under Review</IOR_CatalogueStatus>
+         <EOR_CatalogueStatus>Under Review</EOR_CatalogueStatus> 
+         <CatalogueDetailID>119934</CatalogueDetailID>
+         <CountryID>47</CountryID>
+         <CountryName>China</CountryName> 
+         <SKU>IN-FY-11-Indigo-PJQ</SKU> 
+         <lstCatalogueHistory>
+             <CatalogueID>114475</CatalogueID>
+             <CatalogueStatus>New</CatalogueStatus>
+             <Remarks>Newly Added</Remarks>
+             <LastModifiedByName>624983179</LastModifiedByName>
+             <LastModifiedDate>2025-02-12T06:36:17.680</LastModifiedDate>
+         </lstCatalogueHistory>
+         <ReferenceId></ReferenceId>
+     </0>
+ </root>
