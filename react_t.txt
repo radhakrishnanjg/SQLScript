@@ -63,3 +63,56 @@ useTransition
 
 useDeferredValue
  
+
+Here’s a tabular summary of all common validation rules supported by RJSF via JSON Schema (especially with @rjsf/validator-ajv8) for different data types.
+
+
+---
+
+📋 JSON Schema Validation Rules Table (used by RJSF)
+
+Data Type	JSON Schema Keyword	Description	Example
+
+Common	title	Field label	"title": "Email"
+	description	Help text shown below the field	"description": "Enter your email"
+	default	Default value	"default": "test@example.com"
+String	minLength	Minimum number of characters	"minLength": 6
+	maxLength	Maximum number of characters	"maxLength": 20
+	pattern	Regex pattern to match	"pattern": "^[a-zA-Z]+$"
+	format	Predefined formats: email, uri, date, date-time, etc.	"format": "email"
+Number	minimum	Minimum value	"minimum": 1
+	maximum	Maximum value	"maximum": 100
+	exclusiveMinimum	Must be strictly greater than	"exclusiveMinimum": 5
+	exclusiveMaximum	Must be strictly less than	"exclusiveMaximum": 50
+	multipleOf	Must be a multiple of the specified value	"multipleOf": 5
+Array	minItems	Minimum number of array items	"minItems": 1
+	maxItems	Maximum number of array items	"maxItems": 5
+	uniqueItems	Enforces all items to be unique	"uniqueItems": true
+Object	required	Required fields inside an object	"required": ["name"]
+	properties	Defines the fields of the object	See schema structure
+	dependencies	Conditional fields based on others	See advanced schema
+Enum	enum	Restrict value to a fixed set	"enum": ["Red", "Green"]
+Boolean	(no special rules)	Just set "type": "boolean"	
+
+
+
+---
+
+🛡️ Advanced & Custom Validations
+
+Feature	Description	How to Use
+
+const	Force exact value	"const": "admin"
+oneOf, anyOf, allOf	Schema combinations for conditional logic	Advanced schema logic
+validate()	Custom JavaScript validation logic	Pass via <Form validate={fn} />
+transformErrors()	Customize error messages	Pass via <Form transformErrors={fn} />
+if, then, else	Conditional schemas (JSON Schema Draft 7+)	"if": {...}, "then": {...}
+
+
+
+---
+
+Would you like this exported as a downloadable Excel or CSV file for documentation or development reference?
+
+
+
