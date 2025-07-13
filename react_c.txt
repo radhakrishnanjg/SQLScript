@@ -79,32 +79,103 @@ Java script expersion
   
   https://github.com/vikas62081/agGrid/blob/quickFilter/src/App.js
 
-launchSettings.json
+// File: MyDynamicForm.js
+import React, { useState, useEffect } from "react";
+import Form from "@rjsf/core";
 
-
-"iisSettings": {
-  "windowsAuthentication": true,
-  "anonymousAuthentication": false
-},
-"profiles": {
-  "IIS Express": {
-    "commandName": "IISExpress",
-    "launchBrowser": true,
-    "environmentVariables": {
-      "ASPNETCORE_ENVIRONMENT": "Development"
+// Step 1: Initial static schema
+const baseSchema = {
+  type: "object",
+  properties: {
+    country: {
+      type: "string",
+      title: "Country",
+      enum: ["IN", "US"],
+      enumNames: ["India", "United States"]
     },
-    "windowsAuthentication": true,
-    "anonymousAuthentication": false
-  },
-  "MyApp": {
-    "commandName": "Project",
-    "dotnetRunMessages": true,
-    "launchBrowser": true,
-    "applicationUrl": "https://localhost:5001;http://localhost:5000",
-    "environmentVariables": {
-      "ASPNETCORE_ENVIRONMENT": "Development"
+    state: {
+      type: "string",
+      title: "State"
     },
-    "windowsAuthentication": true,
-    "anonymousAuthentication": false
+    branch: {
+      type: "string",
+      title: "Branch",
+      enum: ["IND", "USA"],
+      enumNames: ["India Branch", "US Branch"]
+    },
+    currency: {
+      type: "string",
+      title: "Currency",
+      enum: ["INR", "USD"]
+    },
+    settlement: {
+      type: "string",
+      title: "Settlement Mode"
+    }
   }
+};
+
+// Step 2: uiSchema with dependsOn metadata
+const uiSchema = {
+  state: {
+    "ui:options": {
+      dependsOn: "country"
+    }
+  },
+  settlement: {
+    "ui:options": {
+      dependsOn: ["branch", "currency"]
+    }
+  }
+};
+
+function MyDynamicForm() {
+  const [formData, setFormData] = useState({});
+  const [schema, setSchema] = useState(baseSchema);
+
+  // Step 3: Fetch logic inside useEffect
+  useEffect(() => {
+    const newSchema = JSON.parse(JSON.stringify(baseSchema));
+
+    const fetchStateOptions = async () => {
+      if (formData.country) {
+        const res = await fetch(`/api/lookups?category=state&parent1=${formData.country}`);
+        const options = await res.json();
+        newSchema.properties.state.enum = options.map(o => o.name);
+        newSchema.properties.state.enumNames = options.map(o => o.description);
+      }
+    };
+
+    const fetchSettlementOptions = async () => {
+      if (formData.branch && formData.currency) {
+        const res = await fetch(
+          `/api/lookups?category=settlement&parent1=${formData.branch}&parent2=${formData.currency}`
+        );
+        const options = await res.json();
+        newSchema.properties.settlement.enum = options.map(o => o.name);
+        newSchema.properties.settlement.enumNames = options.map(o => o.description);
+      }
+    };
+
+    Promise.all([fetchStateOptions(), fetchSettlementOptions()]).then(() => {
+      setSchema(newSchema);
+    });
+  }, [formData.country, formData.branch, formData.currency]);
+
+  const handleChange = ({ formData }) => {
+    setFormData(formData);
+  };
+
+  return (
+    <Form
+      schema={schema}
+      uiSchema={uiSchema}
+      formData={formData}
+      onChange={handleChange}
+      onSubmit={({ formData }) => console.log("Submitted:", formData)}
+    />
+  );
 }
+
+export default MyDynamicForm;
+
