@@ -152,6 +152,12 @@ begin
 	alter table dbo.RoleMenu
 	add constraint FK_RoleMenu Foreign key (RoleId) references Roles(RoleId)
 end
+-- Checking Foreign Key with cascadding delete
+IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'FK_RoleMenu')
+BEGIN
+    ALTER TABLE dbo.RoleMenu    
+    ADD CONSTRAINT FK_RoleMenu         FOREIGN KEY (RoleId)         REFERENCES dbo.Roles(RoleId)         ON DELETE CASCADE;
+END
 --------------------------------------------------------------------------------------------------------------------------------------
 -- Checking unique Key 
 IF NOT EXISTS(SELECT 1 FROM sys.key_constraints WHERE type = 'UQ'   and name='UK_RoleMenu')
