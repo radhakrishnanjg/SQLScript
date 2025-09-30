@@ -94,13 +94,46 @@ Object	required	Required fields inside an object	"required": ["name"]
 Enum	enum	Restrict value to a fixed set	"enum": ["Red", "Green"]
 Boolean	(no special rules)	Just set "type": "boolean"	
 
+  [HttpGet]
+        [Route("GetFileTemplate")]
+        public HttpResponseMessage GetFileTemplate(string FileType)
+        {
+            string dbfilepath = string.Empty;
+            dbfilepath = ConfigurationManager.AppSettings["SharedDrive_ZPath"].ToString() + ConfigurationManager.AppSettings["DownloadFiles_MasterData"].ToString() + FileType + ".xlsx";
+            return DownloadFile(dbfilepath, FileType);
+        } 
 
- .help-block
-{
-  margin:0px;
-  padding:0px;  
-  color:#CC4141;
-  font-size: 11px;
-  line-height: 12px;
-}
 
+        private HttpResponseMessage DownloadFile(string downloadFilePath, string fileName)
+        {
+            try
+            {
+                // downloadFilePath = @"http://meera.jennifer-in.com\UploadFiles\MasterData\05082019044518BRANDexcel.xlsx";
+                //Check if the file exists. If the file doesn't exist, throw a file not found exception
+                if (!System.IO.File.Exists(downloadFilePath))
+                {
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                } 
+                //Copy the source file stream to MemoryStream and close the file stream
+                MemoryStream responseStream = new MemoryStream();
+                Stream fileStream = System.IO.File.Open(downloadFilePath, FileMode.Open);
+
+                fileStream.CopyTo(responseStream);
+                fileStream.Close();
+                responseStream.Position = 0;
+
+                HttpResponseMessage response = new HttpResponseMessage();
+                response.StatusCode = HttpStatusCode.OK;
+
+                //Write the memory stream to HttpResponseMessage content
+                response.Content = new StreamContent(responseStream);
+                string contentDisposition = string.Concat("attachment; filename=", fileName);
+                response.Content.Headers.ContentDisposition =
+                              ContentDispositionHeaderValue.Parse(contentDisposition);
+                return response;
+            }
+            catch
+            {
+                throw new HttpResponseException(HttpStatusCode.InternalServerError);
+            }
+        } 
