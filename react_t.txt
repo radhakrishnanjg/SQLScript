@@ -384,4 +384,25 @@ Would you like this exported as a downloadable Excel or CSV file for documentati
     return array.indexOf(word.toLowerCase()) > -1;
   }
 
+  public getFileTemplate(filetype: string) {
+    return this.httpClient.get(environment.baseUrl + `MasterUpload/GetFileTemplate?FileType=` + filetype,
+      { responseType: 'blob' })
+      .pipe(catchError(this.handleError));
+  }
+
+public save(Filedata: File, Remarks: string, FileType: string): Observable<Result> {
+    let currentUser = this.authenticationService.currentUserValue;
+    let CompanyDetailID = currentUser.CompanyDetailID;
+    let CompanyID = currentUser.CompanyID;
+    let LoginId = currentUser.UserId;
+    let frmData = new FormData();
+    frmData.append("FileType", FileType);
+    frmData.append("LoginId", LoginId.toString());
+    frmData.append("CompanyDetailID", CompanyDetailID.toString());
+    frmData.append("CompanyID", CompanyID.toString());
+    frmData.append("FileData", Filedata, Filedata.name);
+    frmData.append("Remarks", Remarks);
+    return this.httpClient.post<Result>(environment.baseUrl + `MasterUpload/UploadFile`, frmData)
+      .pipe(catchError(this.handleError));
+  }
 
