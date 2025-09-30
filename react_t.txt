@@ -115,4 +115,273 @@ if, then, else	Conditional schemas (JSON Schema Draft 7+)	"if": {...}, "then": {
 Would you like this exported as a downloadable Excel or CSV file for documentation or development reference?
 
 
+<div class="row">
+  <div class="col-sm-6 col-lg-6">
+    <h3>
+      Masters Upload
+    </h3>
+  </div>
+  <div class="col-sm-6 col-lg-6">
+    <div class="pull-right hidden-xs">
+      <ol class="breadcrumb" id="dynamicbreadcrumb">
+        <li>
+           <span>Upload</span>
+        </li>
+        <li>
+           <span> Masters</span>
+        </li>
+        <li class="active">
+          
+          Upload
+        </li>
+      </ol>
+    </div>
+  </div>
+</div>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <div class="row">
+      <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+        <span class="groupspanheader">
+          Upload
+        </span>
+      </div>
+      <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+        <div class="pull-right">
+          <button type="button" class="btn btn-primary" routerLinkActive="active" routerLink="/MasterUploadList">Back</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <form   [formGroup]="MasterUploadForm" (ngSubmit)="uploadFiles()" class="form-horizontal">
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-sm-7">
+          <b>General Instructions :</b><br />
+          <ul class="list-group">
+            <li class="list-group-item">Change the Sheet name as "Sheet1"</li>
+            <li class="list-group-item">Don't add any extra columns to the RAW file.</li>
+            <li class="list-group-item">Convert the format of all the Numeric values to Number with two decimal
+              values and then again change the format as TEXT, &nbsp; remove commas in between.</li>
+            <li class="list-group-item">Delete any extra blank columns if any till end.</li>
+            <li class="list-group-item">Delete any extra Blank Rows if any till end.</li>
+            <li class="list-group-item">Remove any characters (like -) in numeric columns, Make it blank or ZERO.</li>
+          </ul>
+        </div>
+        <div class="col-sm-5">
+
+          <div class="form-group" [ngClass]="{'has-error': formErrors.FileType}">
+            <label class="col-sm-3  control-label" for="FileType">File Type <span class="mandantory">*</span></label>
+            <div class="col-md-9">
+
+              <div class="input-group">
+                <select id="FileType" class="form-control" formControlName="FileType" (blur)="logValidationErrors()">
+                  <option value="" selected="selected">Select</option>
+                  <option *ngFor="let c1 of lstmasterscreens" value={{c1.DropdownValue}}>
+                    {{c1.DropDownDescription}}
+                  </option>
+                </select>
+                <span class="input-group-addon" style="cursor: pointer" (click)="onDownloadTemplate()">
+                  <span class="fa fa-download"></span>
+                </span>
+              </div>
+              <div class="help-block-rk">
+                <span class="help-block" *ngIf="formErrors.FileType">
+                  {{formErrors.FileType}}
+                </span>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="form-group" [ngClass]="{'has-error': formErrors.FileData}">
+            <label class="col-sm-3 control-label" for="SelectSelect">File <span class="mandantory">*</span> </label>
+            <div class="col-md-9">
+              <input type="file" id="file" (change)="onFileChanged($event)"
+                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" formControlName="FileData">
+              <div class="help-block-rk">
+                <span class="help-block" *ngIf="formErrors.FileData">
+                  {{formErrors.FileData}}
+                </span>
+              </div>
+            </div>
+
+          </div>
+
+
+          <div class="form-group" [ngClass]="{'has-error': formErrors.Remarks}">
+            <label class="col-sm-3 control-label" for="Remarks">Remarks <span class="mandantory">*</span></label>
+            <div class="col-sm-9">
+              <input id="Remarks" type="text" class="form-control" formControlName="Remarks"
+                (blur)="logValidationErrors()" maxlength="500">
+              <span class="help-block" *ngIf="formErrors.Remarks">
+                {{formErrors.Remarks}}
+              </span>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <div class="pull-right btn-toolbar">
+        <button class="btn btn-primary" routerLinkActive="active" routerLink="/MasterUploadList">Cancel</button>
+        <button type="submit" prevent-double-submit [disabled]="MasterUploadForm.invalid"
+          class="btn btn-success">Upload</button>
+      </div>
+      <div class="clearfix"></div>
+    </div>
+  </form>
+</div>
+
+ lstmasterscreens: Dropdown[];
+  MasterUploadForm: FormGroup;
+  uploaddata: MasterUpload = {} as any;
+  selectedFile: File;
+  kycFiles_Ext = Apisettings.KYCFiles_Ext;
+  kycFiles_Fileszie = Apisettings.KYCFiles_Fileszie;
+  $: any;
+  constructor(
+    private router: Router,
+    private fb: FormBuilder,
+    public _masteruploadService: MasteruploadService,
+    public _alertService: ToastrService,
+ 
+    private _UserService: UserService,
+    private _authorizationGuard: AuthorizationGuard
+  ) {
+  }
+
+  formErrors = {
+    'FileType': '',
+    'FileData': '',
+    'Remarks': '',
+  };
+
+  validationMessages = {
+    'FileType': {
+      'required': 'This Field is required.',
+    },
+    'Remarks': {
+      'required': 'This Field is required.',
+      'minlength': 'This Field must be greater than 3 characters.',
+      'maxlength': 'This Field must be less than 500 characters.'
+    },
+    'FileData': {
+      'required': 'This Field is required.',
+    },
+  };
+
+  logValidationErrors(group: FormGroup = this.MasterUploadForm): void {
+    Object.keys(group.controls).forEach((key: string) => {
+      const abstractControl = group.get(key);
+      if (abstractControl && abstractControl.value && abstractControl.value.length > 0 && !abstractControl.value.replace(/^\s+|\s+$/gm, '').length) {
+        abstractControl.setValue('');
+      }
+      this.formErrors[key] = '';
+      if (abstractControl && !abstractControl.valid &&
+        (abstractControl.touched || abstractControl.dirty)) {
+        const messages = this.validationMessages[key];
+        for (const errorKey in abstractControl.errors) {
+          if (errorKey) {
+            this.formErrors[key] += messages[errorKey] + ' ';
+          }
+        }
+      }
+      if (abstractControl instanceof FormGroup) {
+        this.logValidationErrors(abstractControl);
+      }
+    });
+  }
+
+  ngOnInit() {
+    //
+    this._UserService.getUserMasterUploadScreens()
+      .subscribe(
+        (data: Dropdown[]) => {
+          this.lstmasterscreens = data.filter(a => a.IsReportingServer != true);
+
+        },
+        (err: any) => {
+          //
+          console.log(err)
+        }
+      );
+
+    this.MasterUploadForm = this.fb.group({
+      FileType: ['', [Validators.required]],
+      Remarks: ['', [Validators.required,]],
+      FileData: ['', [Validators.required]],
+    });
+  }
+  onLoad() {
+  }
+  onFileChanged(e: any) {
+    this.selectedFile = e.target.files[0];
+  }
+
+  onDownloadTemplate() {
+
+    let filetype = this.MasterUploadForm.controls['FileType'].value;
+    if (filetype != "") {
+      //
+      this._masteruploadService.getFileTemplate(filetype)
+        .subscribe(data => {
+
+          saveAs(data, filetype + '.xlsx')
+        },
+          (err) => {
+            //
+            console.log(err);
+          }
+        );
+    } else {
+      this._alertService.error("Please select file type.!");
+    }
+  }
+
+  uploadFiles() {
+    if (this._authorizationGuard.CheckAcess("MasterUploadList", "ViewEdit")) {
+      return;
+    }
+    if (this.MasterUploadForm.invalid) {
+      return;
+    }
+    var filesizeMB = Math.round(this.selectedFile.size / 1024 / 1024);
+    var fileexte = this.selectedFile.name.split('.').pop();
+    var allowedmb = parseInt(Apisettings.KYCFiles_Fileszie.toString())
+    if (!this.isInArray(Apisettings.KYCFiles_Ext, fileexte)) {
+      this._alertService.error("File must be extension with " + Apisettings.KYCFiles_Ext);
+      return;
+    }
+    else if (filesizeMB > allowedmb) {
+      this._alertService.error("File size must be less than or equal to " + Apisettings.KYCFiles_Fileszie + " MB");
+      return;
+    }
+    this.uploaddata.FileType = this.MasterUploadForm.controls['FileType'].value;
+    this.uploaddata.Remarks = this.MasterUploadForm.controls['Remarks'].value;
+    //
+    this._masteruploadService.save(this.selectedFile, this.uploaddata.Remarks, this.uploaddata.FileType).subscribe(
+      (data) => {
+        if (data.Flag) {
+          this._alertService.success(data.Msg);
+          this.router.navigate(['/MasterUploadList']);
+        }
+        else {
+          this._alertService.error(data.Msg);
+          this.router.navigate(['/MasterUploadList']);
+        }
+        //
+      },
+      (error: any) => {
+        //
+      }
+    );
+
+  }
+
+  isInArray(array, word) {
+    return array.indexOf(word.toLowerCase()) > -1;
+  }
+
 
